@@ -22,6 +22,42 @@ function mockToken() {
   return "mock_" + Math.random().toString(36).slice(2) + Date.now().toString(36)
 }
 
+function ensureAdminSeed() {
+  const sellers = getMockSellers()
+  let mutated = false
+  // Ensure platform admin exists
+  const adminEmail = "admin@cognicart.ng"
+  if (!sellers.find((s) => s.email.toLowerCase() === adminEmail)) {
+    sellers.push({
+      id: "seller_admin",
+      businessName: "Cognicart Platform",
+      email: adminEmail,
+      phone: "+2348000000000",
+      password: "Admin123!",
+      role: "admin",
+      isActive: true,
+      createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+    } as Seller & { password: string })
+    mutated = true
+  }
+  // Ensure owner exists
+  const ownerEmail = "owner@cognicart.ng"
+  if (!sellers.find((s) => s.email.toLowerCase() === ownerEmail)) {
+    sellers.push({
+      id: "seller_owner",
+      businessName: "Cognicart Owner",
+      email: ownerEmail,
+      phone: "+2348000000001",
+      password: "Owner123!",
+      role: "platform_owner",
+      isActive: true,
+      createdAt: new Date(Date.now() - 86400000 * 60).toISOString(),
+    } as Seller & { password: string })
+    mutated = true
+  }
+  if (mutated) saveMockSellers(sellers)
+}
+
 export const authService = {
   async register(payload: RegisterPayload): Promise<AuthResponse> {
     try {
@@ -29,16 +65,20 @@ export const authService = {
       return data
     } catch {
       // Mock fallback
+      ensureAdminSeed()
       const sellers = getMockSellers()
       if (sellers.find((s) => s.email.toLowerCase() === payload.email.toLowerCase())) {
         throw new Error("Email already registered")
       }
+      const isAdminEmail = payload.email.toLowerCase() === "admin@cognicart.ng" || payload.email.toLowerCase() === "owner@cognicart.ng"
       const seller: Seller & { password: string } = {
         id: "seller_" + Date.now().toString(36),
         businessName: payload.businessName,
         email: payload.email.toLowerCase(),
         phone: payload.phone,
         password: payload.password,
+        role: isAdminEmail ? "admin" : "seller",
+        isActive: true,
         createdAt: new Date().toISOString(),
       }
       sellers.push(seller)
@@ -54,11 +94,15 @@ export const authService = {
       const { data } = await api.post<AuthResponse>("/auth/login", payload)
       return data
     } catch {
+      ensureAdminSeed()
       const sellers = getMockSellers()
       const found = sellers.find((s) => s.email.toLowerCase() === payload.email.toLowerCase() && s.password === payload.password)
       if (!found) throw new Error("Invalid email or password")
+      if (found.isActive === false) throw new Error("Account suspended. Contact platform support.")
       const token = mockToken()
       const { password: _pw, ...rest } = found
+      // Ensure role defaults to seller if missing
+      if (!rest.role) rest.role = rest.email.includes("admin") || rest.email.includes("owner") ? "admin" : "seller"
       return { token, seller: rest }
     }
   },

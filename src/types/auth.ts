@@ -3,6 +3,8 @@ export type Seller = {
   businessName: string
   email: string
   phone?: string
+  role?: "seller" | "admin" | "platform_owner"
+  isActive?: boolean
   createdAt: string
 }
 

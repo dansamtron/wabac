@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
-import { MessageCircle, LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Menu, X, Store, Wallet, MessageSquare } from "lucide-react"
+import { MessageCircle, LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Menu, X, Store, Wallet, MessageSquare, Shield } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import { useState } from "react"
 
@@ -71,6 +71,15 @@ export function DashboardLayout() {
                   <item.icon className="h-4 w-4" /> {item.label}
                 </NavLink>
               ))}
+              {(user?.role === "admin" || user?.role === "platform_owner") && (
+                <NavLink
+                  to="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold bg-[#E6F7F1] text-[#0B9C74] border border-[#0B9C74]/20 hover:bg-[#0B9C74] hover:text-white transition"
+                >
+                  <Shield className="h-4 w-4" /> Platform Admin
+                </NavLink>
+              )}
             </nav>
             <button onClick={handleLogout} className="mt-3 w-full lg:hidden flex items-center gap-2 rounded-xl border border-[#F3E6D3] px-3 py-2.5 text-sm font-medium">
               <LogOut className="h-4 w-4" /> Logout

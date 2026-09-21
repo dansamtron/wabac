@@ -15,7 +15,9 @@ import WhatsAppPage from "../pages/whatsapp/WhatsApp"
 import Storefront from "../pages/storefront/Storefront"
 import ProductDetail from "../pages/storefront/ProductDetail"
 import { DashboardLayout } from "../layouts/DashboardLayout"
+import { AdminLayout } from "../layouts/AdminLayout"
 import { ProtectedRoute } from "./ProtectedRoute"
+import { AdminRoute } from "./AdminRoute"
 import About from "../pages/public/About"
 import Contact from "../pages/public/Contact"
 import Careers from "../pages/public/Careers"
@@ -26,6 +28,17 @@ import Demo from "../pages/public/Demo"
 import Search from "../pages/Search"
 import Cart from "../pages/Cart"
 import Checkout from "../pages/Checkout"
+import AdminDashboard from "../pages/admin/Dashboard"
+import AdminSellers from "../pages/admin/Sellers"
+import AdminSellerDetails from "../pages/admin/SellerDetails"
+import AdminOrders from "../pages/admin/Orders"
+import AdminCustomers from "../pages/admin/Customers"
+import AdminRevenue from "../pages/admin/Revenue"
+import AdminPayments from "../pages/admin/Payments"
+import AdminWhatsApp from "../pages/admin/WhatsApp"
+import AdminSubscriptions from "../pages/admin/Subscriptions"
+import AdminReports from "../pages/admin/Reports"
+import AdminSettings from "../pages/admin/Settings"
 
 function NotFound() {
   return (
@@ -78,6 +91,26 @@ export function AppRoutes() {
         <Route path="/dashboard/revenue" element={<Revenue />} />
         <Route path="/dashboard/settings" element={<Settings />} />
         <Route path="/dashboard/whatsapp" element={<WhatsAppPage />} />
+      </Route>
+
+      <Route
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/sellers" element={<AdminSellers />} />
+        <Route path="/admin/sellers/:id" element={<AdminSellerDetails />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/admin/customers" element={<AdminCustomers />} />
+        <Route path="/admin/revenue" element={<AdminRevenue />} />
+        <Route path="/admin/payments" element={<AdminPayments />} />
+        <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
+        <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
