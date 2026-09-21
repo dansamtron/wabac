@@ -59,9 +59,25 @@ export const productService = {
       return data
     } catch (error) {
       if (!isMockMode(error)) throw error
-      const found = getMockProducts().find((p) => p.id === id && p.sellerId === getSellerId())
+      let found = getMockProducts().find((p) => p.id === id && p.sellerId === getSellerId())
+      if (!found) found = getMockProducts().find((p) => p.id === id)
       if (!found) throw new Error("Product not found")
       return found
+    }
+  },
+
+  async listPublic(params?: { search?: string; category?: string }): Promise<Product[]> {
+    try {
+      const { data } = await api.get<Product[]>("/products", { params: { ...params, public: true } })
+      return data.filter((p) => p.isActive)
+    } catch {
+      let products = getMockProducts().filter((p) => p.isActive)
+      if (params?.search) {
+        const q = params.search.toLowerCase()
+        products = products.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
+      }
+      if (params?.category) products = products.filter((p) => p.category === params.category)
+      return products
     }
   },
 

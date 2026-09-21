@@ -34,6 +34,8 @@ export type Order = {
   deliveryFee: number
   total: number
   paymentStatus: PaymentStatus
+  paymentReference?: string
+  currency?: string
   orderStatus: OrderStatus
   createdAt: string
   updatedAt: string

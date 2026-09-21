@@ -14,7 +14,8 @@ export default function Storefront() {
 
   const load = async () => {
     setLoading(true)
-    const data = await productService.list({ search: q || undefined, category: category || undefined })
+    // Public marketplace should show all active products across sellers
+    const data = await productService.listPublic({ search: q || undefined, category: category || undefined })
     setProducts(data.filter((p) => p.isActive))
     setLoading(false)
   }

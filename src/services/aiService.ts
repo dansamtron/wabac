@@ -111,6 +111,25 @@ async function toolCreateOrder(_sellerId: string, args: { items: Array<{ product
   })
 }
 
+async function toolCreatePayment(sellerId: string, args: { orderId: string; email?: string }) {
+  const { paymentService } = await import("./paymentService")
+  const orderRaw = localStorage.getItem("cognicart_orders")
+  const orders = orderRaw ? (JSON.parse(orderRaw) as Array<{ id: string; sellerId: string; total: number; subtotal: number; deliveryFee: number; paymentStatus: string }>) : []
+  const order = orders.find((o) => o.id === args.orderId && o.sellerId === sellerId)
+  if (!order) throw new Error("Order not found for this seller")
+  if (order.paymentStatus === "Paid") return { alreadyPaid: true, reference: (order as unknown as { paymentReference?: string }).paymentReference }
+  const email = args.email || `${sellerId}@cognicart.test`
+  const { reference, transaction } = await paymentService.initialize({
+    orderId: order.id,
+    amount: order.total,
+    email,
+    sellerId,
+    subtotal: order.subtotal,
+    deliveryFee: order.deliveryFee,
+  })
+  return { reference, amount: order.total, transaction }
+}
+
 // Helpers to parse customer intent
 
 function extractQuantity(text: string): number | null {
@@ -178,6 +197,7 @@ export const aiService = {
       { name: "getBusinessInfo", description: "Get seller business info", parameters: {} },
       { name: "calculateOrderTotal", description: "Calculate order total", parameters: { items: { type: "array", required: true, description: "items" }, deliveryFee: { type: "number", required: false, description: "fee" } } },
       { name: "createOrder", description: "Create order for customer", parameters: { items: { type: "array", required: true, description: "items" }, customer: { type: "object", required: true, description: "customer" }, deliveryAddress: { type: "string", required: false, description: "address" } } },
+      { name: "createPayment", description: "Create Paystack payment for order", parameters: { orderId: { type: "string", required: true, description: "order id" }, email: { type: "string", required: false, description: "customer email" } } },
     ]
   },
 
@@ -234,11 +254,13 @@ export const aiService = {
             customer: { name: customerPhone, phone: customerPhone, address: ctx.pendingAddress },
             deliveryAddress: ctx.pendingAddress,
           })
-          const ord = order as unknown as { id: string }
+          const ord = order as unknown as { id: string; total: number }
           toolCalls[1].result = order
           orderId = ord.id
-          reply = `Order created! #${ord.id.slice(-6).toUpperCase()} — ${ctx.pendingProductName} x${ctx.pendingQuantity} → ₦${(totals as { total: number }).total.toLocaleString()} (delivery ₦${(totals as { deliveryFee: number }).deliveryFee.toLocaleString()}). I will confirm delivery to ${ctx.pendingAddress}. You will receive a confirmation shortly. Want anything else?`
-          // clear context
+          ctx.lastOrderId = ord.id
+          ctx.lastOrderTotal = (totals as { total: number }).total
+          reply = `Order created! #${ord.id.slice(-6).toUpperCase()} — ${ctx.pendingProductName} x${ctx.pendingQuantity} → ₦${(totals as { total: number }).total.toLocaleString()} (delivery ₦${(totals as { deliveryFee: number }).deliveryFee.toLocaleString()}). I will confirm delivery to ${ctx.pendingAddress}. Reply PAY to get Paystack link or you can pay on delivery. Want anything else?`
+          // clear context but keep lastOrderId
           ctx.pendingProductId = undefined
           ctx.pendingQuantity = undefined
           ctx.pendingAddress = undefined
@@ -410,6 +432,41 @@ export const aiService = {
         reply = `Found ${results.length} product${results.length > 1 ? "s" : ""} for "${keyword}":\n${list}\nReply with the name and quantity, e.g. "Elixir Glow Serum x1 deliver to Yaba"`
         return { reply, toolCalls, intent }
       }
+    }
+
+    // Payment intent - generate Paystack link for last order
+    if (lower === "pay" || lower === "yes pay" || lower.includes("pay for") || lower.includes("paystack") || lower.includes("payment link") || lower.includes("how to pay")) {
+      intent = "create_payment"
+      let orderId = ctx.lastOrderId
+      // fallback: find most recent pending order for this phone
+      if (!orderId) {
+        try {
+          const ordersRaw = localStorage.getItem("cognicart_orders")
+          const orders = ordersRaw ? (JSON.parse(ordersRaw) as Array<{ id: string; sellerId: string; customerPhone: string; paymentStatus: string; total: number }>) : []
+          const pending = orders.filter((o) => o.sellerId === sellerId && o.customerPhone === customerPhone && o.paymentStatus === "Pending").sort((a, b) => b.id.localeCompare(a.id))
+          if (pending.length > 0) orderId = pending[0].id
+        } catch {}
+      }
+      if (!orderId) {
+        reply = `I could not find a pending order for you. Please place an order first, e.g. "Elixir Glow Serum x1 deliver to Ikeja"`
+        return { reply, toolCalls, intent }
+      }
+      const callId = "call_" + Date.now()
+      toolCalls.push({ id: callId, name: "createPayment", arguments: { orderId, email: `${customerPhone.replace(/[^0-9]/g, "")}@cognicart.test` } })
+      try {
+        const result = await toolCreatePayment(sellerId, { orderId, email: `${customerPhone.replace(/[^0-9]/g, "")}@cognicart.test` })
+        toolCalls[0].result = result
+        if ((result as { alreadyPaid?: boolean }).alreadyPaid) {
+          reply = `Order #${orderId.slice(-6).toUpperCase()} is already Paid. Thank you!`
+        } else {
+          const r = result as { reference: string; amount: number }
+          reply = `Paystack link generated for order #${orderId.slice(-6).toUpperCase()} — ₦${r.amount.toLocaleString()}.\nRef: ${r.reference}\nPay now: your Paystack checkout will open. After payment, reply paid and I will confirm. Test mode: payment will auto-verify in 1 second.`
+        }
+      } catch (e) {
+        toolCalls[0].error = e instanceof Error ? e.message : "Failed"
+        reply = `Could not create payment: ${toolCalls[0].error}`
+      }
+      return { reply, toolCalls, orderId, intent }
     }
 
     // Fallback

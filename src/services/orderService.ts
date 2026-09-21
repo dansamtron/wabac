@@ -72,16 +72,24 @@ export const orderService = {
     } catch (error) {
       if (!isMockMode(error)) throw error
       // Mock: validate products, preserve price, check stock, create customer, compute totals
-      const sellerId = getSellerId()
-      // get products to preserve price and validate sellerId
+      // Derive sellerId from first product so public cart (anonymous) works for any seller
       let products: Array<{ id: string; sellerId: string; name: string; price: number; stock: number; images: string[] }> = []
       try {
         products = JSON.parse(localStorage.getItem(PRODUCT_KEY) || "[]")
       } catch {
         products = []
       }
+      // Resolve sellerId from products when public cart
+      const inferredSellerId = (() => {
+        const firstId = payload.items[0]?.productId
+        const firstProd = products.find((p) => p.id === firstId)
+        return firstProd?.sellerId || getSellerId()
+      })()
+      const sellerId = inferredSellerId
       const orderItems = payload.items.map(({ productId, quantity }) => {
-        const prod = products.find((p) => p.id === productId && p.sellerId === sellerId)
+        // Prefer seller-scoped product, fallback to public lookup for cart
+        let prod = products.find((p) => p.id === productId && p.sellerId === sellerId)
+        if (!prod) prod = products.find((p) => p.id === productId)
         if (!prod) throw new Error(`Product not found: ${productId}`)
         if (!Number.isInteger(quantity) || quantity <= 0) throw new Error(`Invalid quantity for ${prod.name}`)
         if (prod.stock < quantity) throw new Error(`Insufficient stock for ${prod.name}. Available ${prod.stock}`)
@@ -166,9 +174,21 @@ export const orderService = {
 
   async updatePaymentStatus(id: string, paymentStatus: Order["paymentStatus"]): Promise<Order> {
     const all = getOrders()
-    const idx = all.findIndex((o) => o.id === id && o.sellerId === getSellerId())
+    let idx = all.findIndex((o) => o.id === id && o.sellerId === getSellerId())
+    if (idx === -1) idx = all.findIndex((o) => o.id === id)
     if (idx === -1) throw new Error("Order not found")
     const updated: Order = { ...all[idx], paymentStatus, updatedAt: new Date().toISOString() }
+    all[idx] = updated
+    saveOrders(all)
+    return updated
+  },
+
+  async updatePaymentReference(id: string, reference: string): Promise<Order> {
+    const all = getOrders()
+    let idx = all.findIndex((o) => o.id === id && o.sellerId === getSellerId())
+    if (idx === -1) idx = all.findIndex((o) => o.id === id)
+    if (idx === -1) throw new Error("Order not found")
+    const updated: Order = { ...all[idx], paymentReference: reference, paymentStatus: "Paid", updatedAt: new Date().toISOString() }
     all[idx] = updated
     saveOrders(all)
     return updated

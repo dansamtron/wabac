@@ -15,7 +15,7 @@ export default function Search() {
   useEffect(() => {
     productService.seedDemo()
     if (!q) { setResults([]); return }
-    productService.list({ search: q }).then((data) => setResults(data.filter((p) => p.isActive))).catch(() => setResults([]))
+    productService.listPublic({ search: q }).then((data) => setResults(data.filter((p) => p.isActive))).catch(() => setResults([]))
   }, [q])
 
   const handleSubmit = (e: React.FormEvent) => {
