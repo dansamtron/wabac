@@ -16,6 +16,7 @@ import Storefront from "../pages/storefront/Storefront"
 import ProductDetail from "../pages/storefront/ProductDetail"
 import { DashboardLayout } from "../layouts/DashboardLayout"
 import { AdminLayout } from "../layouts/AdminLayout"
+import { PublicLayout } from "../layouts/PublicLayout"
 import { ProtectedRoute } from "./ProtectedRoute"
 import { AdminRoute } from "./AdminRoute"
 import About from "../pages/public/About"
@@ -39,15 +40,21 @@ import AdminWhatsApp from "../pages/admin/WhatsApp"
 import AdminSubscriptions from "../pages/admin/Subscriptions"
 import AdminReports from "../pages/admin/Reports"
 import AdminSettings from "../pages/admin/Settings"
+import { Header } from "../components/layout/Header"
+import { Footer } from "../components/layout/Footer"
 
 function NotFound() {
   return (
-    <div className="min-h-[60vh] grid place-items-center px-4">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold">404</h1>
-        <p className="mt-2 text-sm text-[#6b6b6b]">Page not found.</p>
-        <a href="/" className="mt-4 inline-flex rounded-full bg-[#0B9C74] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#0a8a66]">Go home</a>
+    <div className="min-h-screen bg-[#FFFBF5] flex flex-col">
+      <Header />
+      <div className="flex-1 min-h-[50vh] grid place-items-center px-4 py-16">
+        <div className="text-center">
+          <h1 className="font-display text-3xl font-bold">404</h1>
+          <p className="mt-2 text-sm text-[#6b6b6b]">Page not found.</p>
+          <a href="/" className="mt-4 inline-flex rounded-full bg-[#0B9C74] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#0a8a66]">Go home</a>
+        </div>
       </div>
+      <Footer />
     </div>
   )
 }
@@ -59,20 +66,22 @@ export function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      <Route path="/store" element={<Storefront />} />
-      <Route path="/store/:id" element={<ProductDetail />} />
-      <Route path="/marketplace" element={<Storefront />} />
+      <Route element={<PublicLayout />}>
+        <Route path="/store" element={<Storefront />} />
+        <Route path="/store/:id" element={<ProductDetail />} />
+        <Route path="/marketplace" element={<Storefront />} />
 
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/careers" element={<Careers />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/whatsapp-api" element={<WhatsAppApi />} />
-      <Route path="/demo" element={<Demo />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/whatsapp-api" element={<WhatsAppApi />} />
+        <Route path="/demo" element={<Demo />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+      </Route>
 
       <Route
         element={
