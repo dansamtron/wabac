@@ -10,6 +10,7 @@ import Orders from "../pages/orders/Orders"
 import OrderDetail from "../pages/orders/OrderDetail"
 import Customers from "../pages/customers/Customers"
 import Settings from "../pages/dashboard/Settings"
+import Revenue from "../pages/dashboard/Revenue"
 import WhatsAppPage from "../pages/whatsapp/WhatsApp"
 import Storefront from "../pages/storefront/Storefront"
 import ProductDetail from "../pages/storefront/ProductDetail"
@@ -74,6 +75,7 @@ export function AppRoutes() {
         <Route path="/dashboard/orders" element={<Orders />} />
         <Route path="/dashboard/orders/:id" element={<OrderDetail />} />
         <Route path="/dashboard/customers" element={<Customers />} />
+        <Route path="/dashboard/revenue" element={<Revenue />} />
         <Route path="/dashboard/settings" element={<Settings />} />
         <Route path="/dashboard/whatsapp" element={<WhatsAppPage />} />
       </Route>

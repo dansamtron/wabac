@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
-import { MessageCircle, LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Menu, X, Store } from "lucide-react"
+import { MessageCircle, LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Menu, X, Store, Wallet, MessageSquare } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import { useState } from "react"
 
@@ -8,6 +8,8 @@ const nav = [
   { to: "/dashboard/products", label: "Products", icon: Package },
   { to: "/dashboard/orders", label: "Orders", icon: ShoppingCart },
   { to: "/dashboard/customers", label: "Customers", icon: Users },
+  { to: "/dashboard/revenue", label: "Revenue", icon: Wallet },
+  { to: "/dashboard/whatsapp", label: "WhatsApp", icon: MessageSquare },
   { to: "/store", label: "Storefront", icon: Store },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
