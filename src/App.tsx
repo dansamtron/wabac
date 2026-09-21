@@ -17,6 +17,7 @@ import {
   Share2,
   Mail,
   Globe,
+  ChevronDown,
 } from "lucide-react"
 
 export default function App() {
@@ -39,7 +40,7 @@ export default function App() {
               </a>
               <nav className="hidden lg:flex items-center gap-1 text-[14px] font-medium text-[#2b2b2b]">
                 <a href="#features" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Features</a>
-                <a href="#marketplace" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition flex items-center gap-1">Marketplace <span className="h-5 w-5 grid place-items-center rounded-full bg-[#FFE7C2] text-[10px]">⌄</span></a>
+                <a href="#marketplace" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition flex items-center gap-1">Marketplace <ChevronDown className="h-3.5 w-3.5 opacity-60" /></a>
                 <a href="#sellers" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Sellers</a>
                 <a href="#pricing" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Pricing</a>
                 <a href="#" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Contact</a>
@@ -110,7 +111,7 @@ export default function App() {
                 chaos.
               </h1>
               <p className="mt-5 max-w-[520px] text-[15px] sm:text-[16px] leading-7 text-[#4a4a4a]">
-                Chat to sell smarter — list once, let your AI handle DMs, upsells and “where’s my order?” while you focus on making. No website headaches.
+                Chat to sell smarter. List once and let your AI handle DMs, upsells and "where is my order?" questions while you focus on making. No website headaches.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
@@ -148,7 +149,7 @@ export default function App() {
                     <div className="absolute bottom-2 left-2 right-2">
                       <div className="rounded-2xl bg-white p-2.5 shadow-lg max-w-[85%]">
                         <div className="text-[11px] font-bold leading-tight">Is it in stock? And a SPF one? Need advice for oily skin 🙏</div>
-                        <div className="mt-2 rounded-xl bg-[#E6F7F1] p-2 text-[11px] leading-snug"><span className="font-bold text-[#0B9C74]">Cognicart AI •</span> Yes! For oily skin try Elixir + Matte Sunscreen — bundle ₹499, free delivery? Want me to add to cart?</div>
+                        <div className="mt-2 rounded-xl bg-[#E6F7F1] p-2 text-[11px] leading-snug"><span className="font-bold text-[#0B9C74]">Cognicart AI •</span> Yes! For oily skin try Elixir plus Matte Sunscreen. Bundle at 499 with free delivery. Want me to add to cart?</div>
                       </div>
                     </div>
                     <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow">
@@ -194,12 +195,12 @@ export default function App() {
               {
                 icon: MessageCircle,
                 title: "AI that Sells",
-                desc: "Answers FAQs, recommends sizes & bundles, and nudges abandoned carts — in your tone.",
+                desc: "Answers FAQs, recommends sizes and bundles, and nudges abandoned carts in your tone.",
               },
               {
                 icon: Store,
                 title: "One Tap Checkout",
-                desc: "Customers check out inside WhatsApp. Cash, transfer or card — auto receipts & tracking.",
+                desc: "Customers check out inside WhatsApp. Cash, transfer or card. Auto receipts and tracking.",
               },
               {
                 icon: TrendingUp,
@@ -225,7 +226,7 @@ export default function App() {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-[34px] sm:text-[42px] font-bold tracking-tight leading-none">Marketplace</h2>
-              <p className="mt-2 text-sm text-[#6b6b6b]">Fresh drops from sellers you follow — chat to buy in one message.</p>
+              <p className="mt-2 text-sm text-[#6b6b6b]">Fresh drops from sellers you follow. Chat to buy in one message.</p>
             </div>
             <div className="flex items-center gap-2">
               <button className="rounded-full bg-white border border-[#F3E6D3] px-4 py-2 text-sm font-bold hover:bg-[#FFF1DA] transition">All</button>
@@ -264,7 +265,7 @@ export default function App() {
                 color: "",
               },
               {
-                name: "Market Tote — Canvas",
+                name: "Market Tote Canvas",
                 price: "₦6,500",
                 rating: "4.9 (301)",
                 img: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&h=600&fit=crop",
@@ -313,7 +314,7 @@ export default function App() {
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-[#E6F7F1] border border-[#0B9C74]/10 px-3 py-1 text-xs font-bold text-[#0B9C74]"><Sparkles className="h-3.5 w-3.5" /> How Cognicart works</span>
             <h2 className="font-display text-[32px] lg:text-[40px] font-bold tracking-tight leading-none mt-4">From chat to checkout in 3 taps</h2>
-            <p className="mt-3 text-sm leading-6 text-[#5a5a5a]">No website needed. Your AI shop lives in WhatsApp — where your customers already are.</p>
+            <p className="mt-3 text-sm leading-6 text-[#5a5a5a]">No website needed. Your AI shop lives in WhatsApp where your customers already are.</p>
           </div>
 
           <div className="mt-10 grid lg:grid-cols-3 gap-6">
@@ -363,7 +364,7 @@ export default function App() {
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-[34px] lg:text-[40px] font-bold tracking-tight leading-none">Simple, fair pricing</h2>
-            <p className="mt-3 text-sm text-[#5a5a5a]">Start free. Grow with you — only pay when you sell. Cancel anytime.</p>
+            <p className="mt-3 text-sm text-[#5a5a5a]">Start free. Grow with you. Only pay when you sell. Cancel anytime.</p>
           </div>
 
           <div className="mt-10 grid lg:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
@@ -379,7 +380,7 @@ export default function App() {
               {
                 name: "Growth",
                 price: "₦9,500",
-                sub: "/month — most popular",
+                sub: "/month, most popular",
                 features: ["Unlimited AI chats", "1,000 products", "Broadcasts & coupons", "Paystack & Flutterwave", "Priority support"],
                 cta: "Start 14-day trial",
                 featured: true,
@@ -422,7 +423,7 @@ export default function App() {
           <div className="rounded-[24px] bg-white p-6 sm:p-10 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div>
               <h3 className="font-display text-[28px] lg:text-[36px] font-bold leading-none tracking-tight">Open your WhatsApp store today.</h3>
-              <p className="mt-3 max-w-[560px] text-sm leading-6 text-[#5a5a5a]">Import from Instagram or catalog in minutes. Your AI starts selling while you sleep — you keep the profit.</p>
+              <p className="mt-3 max-w-[560px] text-sm leading-6 text-[#5a5a5a]">Import from Instagram or catalog in minutes. Your AI starts selling while you sleep and you keep the profit.</p>
               <div className="mt-2 flex items-center gap-4 text-xs font-bold text-[#6b6b6b]">
                 <span className="inline-flex items-center gap-1"><Check className="h-4 w-4 text-[#0B9C74]" /> No card required</span>
                 <span className="inline-flex items-center gap-1"><Check className="h-4 w-4 text-[#0B9C74]" /> 2-min setup</span>
@@ -484,7 +485,7 @@ export default function App() {
             </div>
           </div>
           <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
-            <span>© 2026 Cognicart — Built in Port Harcourt for sellers everywhere.</span>
+            <span>© 2026 Cognicart. Built in Port Harcourt for sellers everywhere.</span>
             <span>Made with ♥ for WhatsApp</span>
           </div>
         </div>
