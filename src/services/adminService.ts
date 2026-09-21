@@ -94,6 +94,37 @@ function getTransactions(): Array<{ sellerId: string; orderId: string; amount: n
   }
 }
 
+function ensureDemoTransactions() {
+  const txs = getTransactions()
+  if (txs.length > 0) return
+  const orders = getOrders().filter((o) => o.paymentStatus === "Paid")
+  if (orders.length === 0) return
+  const fee = getFeeConfig()
+  const seeded = orders.map((o) => {
+    const platformFee = Math.round(o.total * (fee.percentage / 100) + fee.fixed)
+    const paystackFee = Math.min(Math.round(o.total * 0.015), 2000)
+    return {
+      id: "txn_" + o.id,
+      sellerId: o.sellerId,
+      orderId: o.id,
+      amount: o.total,
+      subtotal: o.subtotal,
+      deliveryFee: o.deliveryFee,
+      platformFee,
+      sellerAmount: o.total - platformFee - paystackFee,
+      paystackFee,
+      currency: "NGN",
+      reference: o.paymentReference || "PSK_DEMO_" + o.id.slice(-6).toUpperCase(),
+      email: `${o.customerPhone.replace(/[^0-9]/g, "")}@cognicart.test`,
+      status: "success",
+      createdAt: o.createdAt,
+      verifiedAt: o.updatedAt,
+      channel: "paystack",
+    }
+  })
+  localStorage.setItem(TRANSACTION_KEY, JSON.stringify(seeded))
+}
+
 export const adminService = {
   getFeeConfig,
   setFeeConfig(cfg: PlatformFeeConfig) {
@@ -106,6 +137,7 @@ export const adminService = {
       return data
     } catch (error) {
       if (!isMockMode(error)) throw error
+      ensureDemoTransactions()
       const sellers = getSellers()
       const products = getProducts()
       const orders = getOrders()
@@ -215,6 +247,7 @@ export const adminService = {
   },
 
   async getRevenueBreakdown() {
+    ensureDemoTransactions()
     const orders = getOrders().filter((o) => o.paymentStatus === "Paid")
     const transactions = getTransactions()
     const fee = getFeeConfig()
