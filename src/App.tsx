@@ -1,602 +1,584 @@
 import { useState } from "react"
 import {
-  Check,
-  Sparkles,
-  Palette,
-  LayoutGrid,
-  Type,
-  MousePointer2,
-  Layers,
-  Zap,
-  Sun,
-  Moon,
-  ArrowRight,
   Search,
-  Bell,
   ShoppingBag,
-  TrendingUp,
-  Users,
-  Package,
-  CreditCard,
+  Menu,
+  X,
   Star,
+  ArrowRight,
   Heart,
   MessageCircle,
-  ShieldCheck,
-  Rocket,
-  ExternalLink,
-  ChevronRight,
+  Store,
+  Users,
+  TrendingUp,
+  Sparkles,
+  Check,
   Play,
+  Quote,
+  Share2,
+  Mail,
+  Globe,
 } from "lucide-react"
 
-function App() {
-  const [dark, setDark] = useState(false)
-  const [count, setCount] = useState(0)
-  const [email, setEmail] = useState("")
-  const [activeTab, setActiveTab] = useState("overview")
-  const [liked, setLiked] = useState(false)
+export default function App() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [cart] = useState(2)
 
   return (
-    <div className={dark ? "dark" : ""}>
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-violet-500/30 font-sans antialiased transition-colors duration-300">
-        {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between gap-4">
-              <div className="flex items-center gap-8">
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
-                    <Sparkles className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="text-[15px] font-bold tracking-tight">
-                    wabac<span className="text-violet-600 dark:text-violet-400">.ui</span>
-                  </span>
-                  <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-600/20">Tailwind v4 • OK</span>
-                </div>
-                <nav className="hidden lg:flex items-center gap-1">
-                  {["Overview", "Components", "Colors", "Typography"].map((item) => (
-                    <a key={item} href={`#${item.toLowerCase()}`} className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
-                      {item}
-                    </a>
-                  ))}
-                </nav>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="hidden md:flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 p-1">
-                  <button onClick={() => setDark(false)} className={`rounded-full p-1.5 transition ${!dark ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-300"}`} aria-label="Light">
-                    <Sun className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => setDark(true)} className={`rounded-full p-1.5 transition ${dark ? "bg-slate-700 text-white shadow-sm" : "text-slate-500 hover:text-slate-900"}`} aria-label="Dark">
-                    <Moon className="h-4 w-4" />
-                  </button>
-                </div>
-                <button onClick={() => setDark(!dark)} className="md:hidden rounded-full bg-slate-900 dark:bg-white p-2.5 text-white dark:text-slate-900">
-                  {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                </button>
-                <a href="https://tailwindcss.com" target="_blank" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-slate-900 dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-slate-900 hover:opacity-90 transition">
-                  Docs <ExternalLink className="h-3.5 w-3.5 opacity-60" />
-                </a>
-              </div>
+    <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a] selection:bg-[#0B9C74]/20">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-[#FFFBF5]/90 backdrop-blur-md border-b border-[#F3E6D3]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+          <div className="flex h-[72px] items-center justify-between gap-6">
+            {/* Logo */}
+            <div className="flex items-center gap-8">
+              <a href="#" className="flex items-center gap-2.5">
+                <span className="h-9 w-9 rounded-xl bg-[#0B9C74] flex items-center justify-center text-white shadow-sm">
+                  <MessageCircle className="h-5 w-5 fill-white/20" />
+                </span>
+                <span className="font-display text-[22px] font-black tracking-tight leading-none">wabac</span>
+                <span className="hidden sm:block text-[11px] font-bold tracking-widest text-[#0B9C74] border border-[#0B9C74]/20 bg-[#E6F7F1] px-1.5 py-0.5 rounded">WHATSAPP AI</span>
+              </a>
+              <nav className="hidden lg:flex items-center gap-1 text-[14px] font-medium text-[#2b2b2b]">
+                <a href="#features" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Features</a>
+                <a href="#marketplace" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition flex items-center gap-1">Marketplace <span className="h-5 w-5 grid place-items-center rounded-full bg-[#FFE7C2] text-[10px]">⌄</span></a>
+                <a href="#sellers" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Sellers</a>
+                <a href="#pricing" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Pricing</a>
+                <a href="#" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Contact</a>
+              </nav>
             </div>
-          </div>
-        </header>
 
-        {/* Hero */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-violet-50 via-white to-[#f8fafc] dark:from-violet-950/20 dark:via-slate-950 dark:to-[#020617]" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[480px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-200/40 via-indigo-100/20 to-transparent dark:from-violet-900/20 dark:via-indigo-900/10 blur-3xl" />
-            <div className="absolute top-20 right-[10%] h-72 w-72 rounded-full bg-gradient-to-br from-fuchsia-400/20 to-violet-400/20 blur-3xl" />
-            <div className="absolute top-40 left-[8%] h-64 w-64 rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-400/20 blur-3xl" />
-          </div>
+            <div className="hidden lg:flex items-center gap-3">
+              <button aria-label="Search" className="h-10 w-10 grid place-items-center rounded-full bg-white border border-[#F3E6D3] hover:bg-[#FFF1DA] transition">
+                <Search className="h-4 w-4 text-[#6b6b6b]" />
+              </button>
+              <button aria-label="Cart" className="relative h-10 w-10 grid place-items-center rounded-full bg-white border border-[#F3E6D3] hover:bg-[#FFF1DA] transition">
+                <ShoppingBag className="h-4 w-4 text-[#2b2b2b]" />
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#E85D26] text-white text-[11px] font-bold grid place-items-center">{cart}</span>
+              </button>
+              <a href="#start" className="ml-1 inline-flex items-center justify-center rounded-full bg-[#0B9C74] px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#0a8a66] transition">
+                Start Selling
+              </a>
+            </div>
 
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-12 sm:pt-16 sm:pb-16">
-            <div className="mx-auto max-w-3xl text-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-violet-200 dark:border-violet-800 bg-white dark:bg-slate-900 px-3 py-1 text-xs font-medium shadow-sm">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-slate-700 dark:text-slate-300">Tailwind CSS is working</span>
-                <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-violet-600 px-2 py-0.5 text-white text-[11px]">v4.3.3 <Check className="h-3 w-3" /></span>
+            {/* Mobile */}
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden h-10 w-10 grid place-items-center rounded-full bg-white border border-[#F3E6D3]">
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+          {mobileOpen && (
+            <div className="lg:hidden pb-6 border-t border-[#F3E6D3] pt-4 bg-[#FFFBF5]">
+              <nav className="grid gap-1 text-sm font-medium">
+                <a href="#features" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Features</a>
+                <a href="#marketplace" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Marketplace</a>
+                <a href="#sellers" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Sellers</a>
+                <a href="#pricing" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Pricing</a>
+                <a href="#start" className="mt-2 inline-flex justify-center rounded-full bg-[#0B9C74] px-6 py-3 font-bold text-white">Start Selling</a>
+              </nav>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        {/* Background blobs mimicking Option B */}
+        <div className="absolute inset-0 -z-10 bg-[#FFFBF5]" />
+        <div className="absolute -z-10 top-0 left-0 w-[78%] lg:w-[62%] h-[86%] bg-[#FDEDD3] rounded-br-[90px] lg:rounded-br-[140px]" />
+        <div className="absolute -z-10 top-0 right-0 w-[45%] h-[62%] bg-[#F6C68B]/70 hidden lg:block" style={{ clipPath: "ellipse(80% 90% at 80% 0%)" }} />
+        <div className="absolute -z-10 bottom-0 right-0 w-[58%] lg:w-[46%] h-[220px] lg:h-[300px] bg-[#E85D26] rounded-tl-[80px] lg:rounded-tl-[120px]" />
+        <div className="absolute -z-10 left-[18%] top-[52%] h-3 w-20 hidden lg:flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-[#0B9C74]" />
+          <span className="h-2 w-2 rounded-full bg-white/80" />
+          <span className="h-2 w-2 rounded-full bg-white/50" />
+        </div>
+        {/* tiny plant decorations */}
+        <div className="pointer-events-none absolute -z-10 left-[52%] top-[18%] hidden lg:block text-2xl">🪴</div>
+        <div className="pointer-events-none absolute -z-10 right-[14%] top-[38%] hidden lg:block text-lg">🍋</div>
+
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-10 items-center py-8 lg:py-12">
+            {/* Left copy */}
+            <div className="pt-2 lg:pt-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-3 py-1 text-xs font-semibold shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-[#0B9C74] animate-pulse" /> Trusted by 5,000+ sellers on WhatsApp
               </div>
-
-              <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[0.95]">
-                <span className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-slate-100 dark:to-slate-400 bg-clip-text text-transparent">Build faster with</span>
+              <h1 className="font-display font-black tracking-tight leading-[0.9] text-[38px] sm:text-[54px] lg:text-[62px] mt-5">
+                WhatsApp
                 <br />
-                <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">Tailwind CSS</span>
+                <span className="relative inline-block">
+                  Commerce,
+                  <span className="absolute -right-6 -top-2 hidden sm:inline-flex rotate-3 bg-[#0B9C74] text-white text-[10px] font-bold tracking-widest px-2 py-1 rounded-full">NEW AI</span>
+                </span>
+                <br />
+                <span className="text-[#E85D26]">without</span> the
+                <br />
+                chaos.
               </h1>
-              <p className="mt-4 text-base sm:text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                If you see gradients, rounded cards, shadows, and responsive layout — your setup is <span className="font-semibold text-slate-900 dark:text-white">correctly connected</span> to Vite + React. This page tests every utility.
+              <p className="mt-5 max-w-[520px] text-[15px] sm:text-[16px] leading-7 text-[#4a4a4a]">
+                Chat to sell smarter — list once, let your AI handle DMs, upsells and “where’s my order?” while you focus on making. No website headaches.
               </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button onClick={() => setCount((c) => c + 1)} className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:bg-violet-700 active:scale-[0.98] transition">
-                  <Zap className="h-4 w-4 group-hover:rotate-12 transition" />
-                  Clicked {count} times
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition" />
-                </button>
-                <a href="#components" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white dark:bg-slate-900 px-6 py-3.5 text-sm font-semibold ring-1 ring-slate-200 dark:ring-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm">
-                  <Play className="h-4 w-4" /> View components
+              <div className="mt-7 flex flex-wrap gap-3">
+                <a href="#start" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0B9C74] px-7 py-3.5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(11,156,116,0.25)] hover:bg-[#0a8a66] active:scale-[0.98] transition">
+                  Start selling free <ArrowRight className="h-4 w-4" />
+                </a>
+                <a href="#demo" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E85D26] px-7 py-3.5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(232,93,38,0.25)] hover:bg-[#d55422] active:scale-[0.98] transition">
+                  <Play className="h-4 w-4 fill-white" /> Watch 30s demo
                 </a>
               </div>
 
-              <div className="mt-6 flex items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
-                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" /> JIT enabled</span>
-                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-blue-500" /> HMR active</span>
-                <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-violet-500" /> @tailwindcss/vite</span>
+              <div className="mt-6 flex items-center gap-4">
+                <div className="flex -space-x-2">
+                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" alt="" className="h-8 w-8 rounded-full border-2 border-white object-cover" />
+                  <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=80&h=80&fit=crop" alt="" className="h-8 w-8 rounded-full border-2 border-white object-cover" />
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" alt="" className="h-8 w-8 rounded-full border-2 border-white object-cover" />
+                </div>
+                <div className="text-xs">
+                  <div className="flex items-center gap-1 font-bold"><Star className="h-3.5 w-3.5 fill-[#E85D26] text-[#E85D26]" /> 4.9/5 from 1,200 sellers</div>
+                  <div className="text-[#6b6b6b]">Loved by fashion, beauty & food stores</div>
+                </div>
               </div>
             </div>
 
-            {/* Stats / Bento top */}
-            <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {[
-                { icon: TrendingUp, label: "Build time", value: "42ms", sub: "Vite + Tailwind v4", color: "from-emerald-500 to-teal-600" },
-                { icon: Palette, label: "Utilities", value: "100%", sub: "All classes work", color: "from-violet-500 to-indigo-600" },
-                { icon: Layers, label: "Responsive", value: "xs → 2xl", sub: "Breakpoints active", color: "from-blue-500 to-cyan-600" },
-                { icon: ShieldCheck, label: "Dark mode", value: dark ? "Dark" : "Light", sub: "Toggle to test", color: "from-amber-500 to-orange-600" },
-              ].map((s) => (
-                <div key={s.label} className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 hover:shadow-md hover:ring-violet-200 dark:hover:ring-violet-900/50 transition">
-                  <div className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${s.color} opacity-[0.08] group-hover:opacity-[0.12] transition`} />
-                  <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${s.color} text-white shadow-sm`}>
-                    <s.icon className="h-4 w-4" />
+            {/* Right collage — recreates Option B's 2x2 */}
+            <div className="relative lg:h-[520px] flex items-center">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
+                {/* Top left — Product */}
+                <div className="relative rounded-[22px] bg-white p-3 sm:p-4 shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-[#F3E6D3] flex flex-col">
+                  <div className="absolute -top-2 -right-2 bg-[#0B9C74] text-white text-[10px] font-bold px-2 py-1 rounded-full rotate-3 shadow">BESTSELLER</div>
+                  <div className="flex-1 rounded-xl bg-[#FFF6E8] p-3 flex items-center justify-center">
+                    <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop" alt="Elixir bottle" className="h-28 w-28 object-contain mix-blend-multiply" />
                   </div>
                   <div className="mt-3">
-                    <div className="text-2xl font-bold tracking-tight">{s.value}</div>
-                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{s.label}</div>
-                    <div className="text-[11px] text-slate-400 dark:text-slate-500">{s.sub}</div>
+                    <div className="text-xs font-bold leading-tight">Elixir Glow Serum</div>
+                    <div className="text-[11px] text-[#6b6b6b]">30ml • Vitamin C</div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-sm font-black">$28.00</span>
+                      <span className="h-7 w-7 grid place-items-center rounded-full bg-[#0B9C74] text-white"><ShoppingBag className="h-3.5 w-3.5" /></span>
+                    </div>
+                  </div>
+                  {/* doodle arrow */}
+                  <span className="pointer-events-none absolute -right-6 top-10 hidden lg:block text-[#E85D26] text-xl rotate-12">🖍️</span>
+                </div>
+
+                {/* Top right — Chat on laptop */}
+                <div className="relative rounded-[22px] overflow-hidden bg-[#FFF1DA] border border-[#F3E6D3] shadow-[0_20px_40px_rgba(0,0,0,0.08)] p-0 flex flex-col">
+                  <div className="relative flex-1 bg-white m-2 rounded-2xl overflow-hidden border border-[#F3E6D3]">
+                    <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&h=400&fit=crop" alt="laptop" className="h-28 sm:h-32 w-full object-cover opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <div className="rounded-2xl bg-white p-2.5 shadow-lg max-w-[85%]">
+                        <div className="text-[11px] font-bold leading-tight">Is it in stock? And a SPF one? Need advice for oily skin 🙏</div>
+                        <div className="mt-2 rounded-xl bg-[#E6F7F1] p-2 text-[11px] leading-snug"><span className="font-bold text-[#0B9C74]">wabac AI •</span> Yes! For oily skin try Elixir + Matte Sunscreen — bundle ₹499, free delivery? Want me to add to cart?</div>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow">
+                      <span className="h-6 w-6 rounded-full bg-[#0B9C74] grid place-items-center text-white text-xs">💬</span>
+                    </div>
+                  </div>
+                  <div className="px-3 py-2 flex items-center gap-2 text-[11px] font-medium text-[#6b6b6b]">
+                    <span className="h-6 w-6 rounded-full bg-white border border-[#F3E6D3] grid place-items-center">🌿</span> Replies in 3 seconds
                   </div>
                 </div>
-              ))}
+
+                {/* Bottom left — Sellers 1 */}
+                <div className="relative rounded-[22px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-[#F3E6D3] h-[168px] sm:h-[190px]">
+                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop" alt="two sellers smiling" className="h-full w-full object-cover" />
+                  <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur rounded-full px-3 py-1.5 text-xs font-bold shadow flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-[#FFE7C2] grid place-items-center">✦</span> Amara & Lisa • Lagos
+                  </div>
+                </div>
+
+                {/* Bottom right — Sellers 2 */}
+                <div className="relative rounded-[22px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-[#F3E6D3] h-[168px] sm:h-[190px]">
+                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=600&fit=crop" alt="two sellers" className="h-full w-full object-cover" />
+                  <div className="absolute top-2 left-2 bg-[#0B9C74] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">⭐ 2,341 orders via WhatsApp</div>
+                  <div className="absolute bottom-2 left-2 right-2 flex gap-2">
+                    <span className="flex-1 bg-white/95 backdrop-blur rounded-full px-2 py-1.5 text-[11px] font-bold text-center">Eco • Fashion</span>
+                    <span className="h-8 w-8 grid place-items-center rounded-full bg-white shadow"><Heart className="h-4 w-4 text-[#E85D26]" /></span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Main content */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 space-y-8">
-
-          {/* Status banner — replaces simple "Tailwind is Working" card but keeps it as proof */}
-          <section className="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-slate-900 via-slate-900 to-violet-950 p-[1px] shadow-xl">
-            <div className="rounded-[19px] bg-white dark:bg-slate-900 px-6 py-6 sm:px-8 sm:py-7 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div className="flex gap-4">
-                <div className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20">
-                  <Check className="h-6 w-6 stroke-[3]" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
-                    <span className="sm:hidden inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white text-xs">✓</span>
-                    Tailwind is Working
-                    <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-600/20">Verified</span>
-                  </h2>
-                  <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                    This card uses <code className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono">bg-slate-950</code>,
-                    <code className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono mx-1">rounded-2xl</code>,
-                    <code className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono">shadow-2xl</code> and
-                    <code className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono ml-1">hover:bg-blue-700</code>. If it looks styled, you’re good.
-                  </p>
-                </div>
-              </div>
-              <div className="flex w-full lg:w-auto items-center gap-3">
-                <button onClick={() => setCount(c => c + 1)} className="flex-1 lg:flex-none inline-flex justify-center items-center gap-2 rounded-xl bg-slate-900 dark:bg-white px-5 py-3 text-sm font-semibold text-white dark:text-slate-900 hover:opacity-90 active:scale-[0.98] transition">
-                  Test Button <span className="rounded-full bg-white/20 dark:bg-slate-900/10 px-2 py-0.5 text-xs">{count}</span>
-                </button>
-                <button onClick={() => setLiked(!liked)} className={`rounded-xl p-3 ring-1 transition ${liked ? "bg-rose-50 dark:bg-rose-950/30 text-rose-600 ring-rose-200 dark:ring-rose-900/50" : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 ring-slate-200 dark:ring-slate-700 hover:text-rose-500"}`}>
-                  <Heart className={`h-5 w-5 ${liked ? "fill-current" : ""}`} />
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+      {/* Features — 4 columns like mock "Featured Foytur" */}
+      <section id="features" className="bg-white border-y border-[#F3E6D3]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {[
-              { id: "overview", label: "Overview", icon: LayoutGrid },
-              { id: "buttons", label: "Buttons & Actions", icon: MousePointer2 },
-              { id: "forms", label: "Forms", icon: Search },
-              { id: "grid", label: "Layout & Grid", icon: Layers },
-            ].map((t) => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${activeTab === t.id ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 ring-1 ring-slate-200 dark:ring-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
-                <t.icon className="h-3.5 w-3.5" /> {t.label}
-              </button>
+              {
+                icon: Users,
+                title: "Built for Sellers",
+                desc: "List in 2 minutes. No code, no website. Your shop lives where customers already chat.",
+              },
+              {
+                icon: MessageCircle,
+                title: "AI that Sells",
+                desc: "Answers FAQs, recommends sizes & bundles, and nudges abandoned carts — in your tone.",
+              },
+              {
+                icon: Store,
+                title: "One Tap Checkout",
+                desc: "Customers check out inside WhatsApp. Cash, transfer or card — auto receipts & tracking.",
+              },
+              {
+                icon: TrendingUp,
+                title: "Seller Growth Kit",
+                desc: "Broadcasts, coupons, and restock alerts. See what's selling with a calm, clear dashboard.",
+              },
+            ].map((f) => (
+              <div key={f.title} className="text-center lg:text-left">
+                <div className="mx-auto lg:mx-0 h-10 w-10 rounded-xl border border-[#E6F7F1] bg-[#F0FFF8] grid place-items-center text-[#0B9C74]">
+                  <f.icon className="h-5 w-5" />
+                </div>
+                <div className="mt-3 font-display font-bold text-[16px] leading-tight">{f.title}</div>
+                <div className="mt-1.5 text-sm leading-6 text-[#5a5a5a]">{f.desc}</div>
+              </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Components Showcase */}
-          <section id="components" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left: Buttons */}
-            <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
-              <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between">
-                <h3 className="text-sm font-bold tracking-tight flex items-center gap-2"><MousePointer2 className="h-4 w-4 text-violet-600" /> Buttons & States</h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400">hover • focus • active • disabled</span>
-              </div>
-              <div className="p-6 space-y-6">
-                <div className="flex flex-wrap gap-3">
-                  <button className="rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-500/20 hover:bg-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-600 focus-visible:outline-offset-2 active:scale-[0.98] transition">Primary</button>
-                  <button className="rounded-xl bg-slate-900 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition">Secondary</button>
-                  <button className="rounded-xl bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-semibold ring-1 ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Outline</button>
-                  <button className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Ghost</button>
-                  <button disabled className="rounded-xl bg-slate-100 dark:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-400 cursor-not-allowed">Disabled</button>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <button className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition"><ShoppingBag className="h-4 w-4" /> Add to cart</button>
-                  <button className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium ring-1 ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 transition"><Heart className="h-4 w-4" /> Wishlist</button>
-                  <button className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/20 hover:opacity-90 transition">Gradient <Sparkles className="h-4 w-4" /></button>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <button className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition">bg-blue-600</button>
-                  <button className="rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-600 transition">bg-amber-500</button>
-                  <button className="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 transition">bg-rose-600</button>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-medium"><span className="h-2 w-2 rounded-full bg-emerald-500" /> transition</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-medium"><span className="h-2 w-2 rounded-full bg-blue-500" /> hover:</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-medium"><span className="h-2 w-2 rounded-full bg-violet-500" /> focus-visible:</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-medium"><span className="h-2 w-2 rounded-full bg-amber-500" /> active:scale</span>
-                </div>
-              </div>
+      {/* Social proof strip */}
+      <section className="bg-[#FFFBF5] border-b border-[#F3E6D3]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-center lg:justify-between gap-4 text-xs font-bold tracking-widest text-[#9a9a9a]">
+          <span className="hidden lg:block">TRUSTED BY SELLERS AT</span>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 opacity-70">
+            <span className="font-display text-[18px] tracking-tight text-[#1a1a1a]">Paystack</span>
+            <span className="font-display text-[18px] tracking-tight text-[#1a1a1a]">flutterwave</span>
+            <span className="font-display text-[17px] tracking-tight text-[#1a1a1a]">Shopify</span>
+            <span className="font-display text-[17px] tracking-tight text-[#1a1a1a]">stripe</span>
+            <span className="font-display text-[15px] tracking-tight text-[#1a1a1a]">HubSpot</span>
+          </div>
+          <span className="hidden lg:inline-flex items-center gap-2 font-medium normal-case tracking-normal text-[#0B9C74]"><Check className="h-4 w-4" /> 99.9% uptime</span>
+        </div>
+      </section>
+
+      {/* Marketplace */}
+      <section id="marketplace" className="bg-[#FFFBF5]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-[34px] sm:text-[42px] font-black tracking-tight leading-none">Marketplace</h2>
+              <p className="mt-2 text-sm text-[#6b6b6b]">Fresh drops from sellers you follow — chat to buy in one message.</p>
             </div>
+            <div className="flex items-center gap-2">
+              <button className="rounded-full bg-white border border-[#F3E6D3] px-4 py-2 text-sm font-bold hover:bg-[#FFF1DA] transition">All</button>
+              <button className="rounded-full bg-[#1a1a1a] text-white px-4 py-2 text-sm font-bold">Beauty</button>
+              <button className="rounded-full bg-white border border-[#F3E6D3] px-4 py-2 text-sm font-bold hover:bg-[#FFF1DA] transition hidden sm:inline-flex">Fashion</button>
+              <button className="rounded-full bg-white border border-[#F3E6D3] px-4 py-2 text-sm font-bold hover:bg-[#FFF1DA] transition hidden sm:inline-flex">Home</button>
+              <a href="#" className="ml-2 inline-flex items-center gap-1 text-sm font-bold text-[#0B9C74] hover:gap-1.5 transition">View all <ArrowRight className="h-4 w-4" /></a>
+            </div>
+          </div>
 
-            {/* Right: Alerts & Badges */}
-            <div className="space-y-6">
-              <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 p-6">
-                <h3 className="text-sm font-bold tracking-tight mb-4">Badges & Pills</h3>
-                <div className="flex flex-wrap gap-2">
-                  <span className="inline-flex items-center rounded-full bg-violet-600 px-3 py-1 text-xs font-semibold text-white">New</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-600/20"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live</span>
-                  <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-950/40 px-3 py-1 text-xs font-medium text-amber-800 dark:text-amber-300">Beta</span>
-                  <span className="inline-flex items-center rounded-full bg-slate-900 dark:bg-white px-3 py-1 text-xs font-semibold text-white dark:text-slate-900">Pro</span>
-                  <span className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 px-3 py-1 text-xs font-medium">Neutral</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/40 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-300"><Star className="h-3 w-3" /> 4.9</span>
+          <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {[
+              {
+                name: "Elixir Glow Serum",
+                price: "₦8,500",
+                old: "₦10,000",
+                rating: "4.9 (212)",
+                img: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=600&fit=crop",
+                tag: "Bestseller",
+                color: "bg-[#E6F7F1] text-[#0B9C74]",
+              },
+              {
+                name: "Cozy Knit Hoodie",
+                price: "₦14,000",
+                rating: "4.8 (98)",
+                img: "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=600&h=600&fit=crop",
+                tag: "New drop",
+                color: "bg-[#FFF1DA] text-[#E85D26]",
+              },
+              {
+                name: "Citrus Cold Press",
+                price: "₦2,200",
+                rating: "5.0 (44)",
+                img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&h=600&fit=crop",
+                tag: null,
+                color: "",
+              },
+              {
+                name: "Market Tote — Canvas",
+                price: "₦6,500",
+                rating: "4.9 (301)",
+                img: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&h=600&fit=crop",
+                tag: "Handmade",
+                color: "bg-[#1a1a1a] text-white",
+              },
+            ].map((p) => (
+              <div key={p.name} className="group relative rounded-[20px] bg-white border border-[#F3E6D3] overflow-hidden hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition">
+                <div className="absolute left-2 top-2 z-10 flex items-center gap-1.5">
+                  <span className="h-6 w-6 rounded-full bg-white border border-[#F3E6D3] grid place-items-center shadow-sm">
+                    <Check className="h-3.5 w-3.5 text-[#0B9C74]" />
+                  </span>
+                  {p.tag && <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${p.color}`}>{p.tag}</span>}
                 </div>
-                <div className="mt-4 flex gap-2">
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"><Bell className="h-3.5 w-3.5" /></span>
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 text-white"><MessageCircle className="h-3.5 w-3.5" /></span>
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white"><Check className="h-3.5 w-3.5" /></span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-700 p-6 text-white shadow-lg shadow-violet-500/20">
-                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
-                  <Rocket className="h-5 w-5" />
-                </div>
-                <h4 className="mt-3 text-lg font-bold">Gradient + blur test</h4>
-                <p className="mt-1 text-sm text-violet-100">Checks bg-gradient, backdrop-blur, shadow, and rounded.</p>
-                <button className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-50 transition">
-                  Try hover <ChevronRight className="h-4 w-4" />
+                <button className="absolute right-2 top-2 z-10 h-8 w-8 rounded-full bg-white border border-[#F3E6D3] grid place-items-center shadow-sm hover:bg-[#FFF1DA] transition">
+                  <Heart className="h-4 w-4 text-[#1a1a1a]" />
                 </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Forms */}
-          {(activeTab === "overview" || activeTab === "forms") && (
-            <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-              <div className="lg:col-span-3 rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
-                <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4">
-                  <h3 className="text-sm font-bold flex items-center gap-2"><Search className="h-4 w-4 text-violet-600" /> Forms — ring, focus, placeholder</h3>
+                <div className="aspect-square bg-[#FFFBF5] p-4 flex items-center justify-center">
+                  <img src={p.img} alt={p.name} className="h-full w-full object-contain mix-blend-multiply group-hover:scale-[1.02] transition" />
                 </div>
-                <div className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <label className="space-y-1.5">
-                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Email</span>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@wabac.com" className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-10 pr-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition" />
-                      </div>
-                    </label>
-                    <label className="space-y-1.5">
-                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Select</span>
-                      <select className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition">
-                        <option>Starter — $0/mo</option>
-                        <option>Pro — $29/mo</option>
-                        <option>Scale — $99/mo</option>
-                      </select>
-                    </label>
+                <div className="p-3.5">
+                  <div className="text-[13px] font-bold leading-tight line-clamp-1">{p.name}</div>
+                  <div className="mt-1 flex items-center gap-1 text-xs">
+                    <Star className="h-3 w-3 fill-[#E85D26] text-[#E85D26]" />
+                    <span className="font-semibold">{p.rating}</span>
                   </div>
-                  <label className="space-y-1.5 block">
-                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Message</span>
-                    <textarea rows={3} placeholder="Tell us about your store..." className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition resize-none" />
-                  </label>
-                  <div className="flex flex-wrap items-center gap-4 pt-1">
-                    <label className="inline-flex items-center gap-2 text-sm">
-                      <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" /> Remember me
-                    </label>
-                    <label className="inline-flex items-center gap-2 text-sm">
-                      <input type="radio" name="plan" defaultChecked className="h-4 w-4 border-slate-300 text-violet-600 focus:ring-violet-500" /> Monthly
-                    </label>
-                    <label className="inline-flex items-center gap-2 text-sm">
-                      <input type="radio" name="plan" className="h-4 w-4 border-slate-300 text-violet-600 focus:ring-violet-500" /> Yearly <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">Save 20%</span>
-                    </label>
-                  </div>
-                  <div className="flex gap-3 pt-2">
-                    <button className="rounded-xl bg-slate-900 dark:bg-white px-5 py-2.5 text-sm font-semibold text-white dark:text-slate-900 hover:opacity-90 transition">Subscribe</button>
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
-                    <span className="ml-auto text-xs text-slate-500 dark:text-slate-400 self-center hidden sm:inline">Validates focus:ring & border</span>
+                  <div className="mt-2 flex items-center justify-between">
+                    <div>
+                      <span className="text-sm font-black">{p.price}</span>
+                      {p.old && <span className="ml-1 text-xs line-through text-[#9a9a9a]">{p.old}</span>}
+                    </div>
+                    <button className="h-8 w-8 rounded-full bg-[#1a1a1a] text-white grid place-items-center hover:bg-black transition">
+                      <ShoppingBag className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-              <div className="lg:col-span-2 space-y-6">
-                <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 p-6">
-                  <h3 className="text-sm font-bold mb-3">Shadows & Radius</h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="h-20 rounded-lg bg-white dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex items-center justify-center text-xs font-medium">shadow-sm</div>
-                    <div className="h-20 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center text-xs font-medium">shadow-md</div>
-                    <div className="h-20 rounded-2xl bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-xs font-medium">shadow-xl</div>
-                    <div className="h-20 rounded-md bg-violet-600 text-white flex items-center justify-center text-xs font-medium">rounded-md</div>
-                    <div className="h-20 rounded-xl bg-violet-600 text-white flex items-center justify-center text-xs font-medium">rounded-xl</div>
-                    <div className="h-20 rounded-[24px] bg-violet-600 text-white flex items-center justify-center text-xs font-medium">rounded-[24px]</div>
-                  </div>
+      {/* How it works */}
+      <section id="sellers" className="bg-white border-y border-[#F3E6D3]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#E6F7F1] border border-[#0B9C74]/10 px-3 py-1 text-xs font-bold text-[#0B9C74]"><Sparkles className="h-3.5 w-3.5" /> How wabac works</span>
+            <h2 className="font-display text-[32px] lg:text-[40px] font-black tracking-tight leading-none mt-4">From chat to checkout in 3 taps</h2>
+            <p className="mt-3 text-sm leading-6 text-[#5a5a5a]">No website needed. Your AI shop lives in WhatsApp — where your customers already are.</p>
+          </div>
+
+          <div className="mt-10 grid lg:grid-cols-3 gap-6">
+            {[
+              {
+                step: "01",
+                title: "List your products",
+                desc: "Snap photos, add prices. We generate descriptions and WhatsApp catalogs automatically.",
+                icon: Store,
+                img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop",
+              },
+              {
+                step: "02",
+                title: "AI handles the chat",
+                desc: "Answers stock, size, delivery & haggles politely. Sends cart links inside the chat.",
+                icon: MessageCircle,
+                img: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=400&fit=crop",
+              },
+              {
+                step: "03",
+                title: "You pack & get paid",
+                desc: "Orders sync to your dashboard. Print waybill, confirm payment, trigger delivery.",
+                icon: TrendingUp,
+                img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop",
+              },
+            ].map((s) => (
+              <div key={s.step} className="rounded-[22px] bg-[#FFFBF5] border border-[#F3E6D3] overflow-hidden hover:shadow-[0_16px_30px_rgba(0,0,0,0.06)] transition group">
+                <div className="h-44 overflow-hidden relative">
+                  <img src={s.img} alt="" className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-700" />
+                  <span className="absolute left-3 top-3 rounded-full bg-white border border-[#F3E6D3] px-3 py-1 text-xs font-black">{s.step}</span>
+                  <span className="absolute right-3 bottom-3 h-10 w-10 rounded-xl bg-white border border-[#F3E6D3] grid place-items-center shadow-sm">
+                    <s.icon className="h-5 w-5 text-[#0B9C74]" />
+                  </span>
                 </div>
-                <div className="rounded-2xl bg-slate-900 dark:bg-white p-6 text-white dark:text-slate-900">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold">Opacity & Filters</h4>
-                    <span className="rounded-full bg-white/10 dark:bg-slate-900/10 px-2.5 py-1 text-xs font-medium backdrop-blur">backdrop-blur</span>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <div className="h-12 flex-1 rounded-xl bg-white dark:bg-slate-900 opacity-100 flex items-center justify-center text-xs font-medium ring-1 ring-white/20 dark:ring-slate-200">100%</div>
-                    <div className="h-12 flex-1 rounded-xl bg-white dark:bg-slate-900 opacity-70 flex items-center justify-center text-xs font-medium">70%</div>
-                    <div className="h-12 flex-1 rounded-xl bg-white dark:bg-slate-900 opacity-40 flex items-center justify-center text-xs font-medium">40%</div>
-                  </div>
+                <div className="p-6">
+                  <div className="font-display font-bold text-[18px] leading-tight">{s.title}</div>
+                  <div className="mt-2 text-sm leading-6 text-[#5a5a5a]">{s.desc}</div>
                 </div>
               </div>
-            </section>
-          )}
+            ))}
+          </div>
+        </div>
+      </section>
 
-          {/* Color palette */}
-          <section id="colors" className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
-            <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h3 className="text-sm font-bold flex items-center gap-2"><Palette className="h-4 w-4 text-violet-600" /> Color system & Gradients</h3>
-              <span className="text-xs text-slate-500 dark:text-slate-400">bg-* • text-* • from-* via-* to-*</span>
-            </div>
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-                {[
-                  { name: "violet", cls: "bg-violet-600" },
-                  { name: "indigo", cls: "bg-indigo-600" },
-                  { name: "blue", cls: "bg-blue-600" },
-                  { name: "emerald", cls: "bg-emerald-600" },
-                  { name: "amber", cls: "bg-amber-500" },
-                  { name: "rose", cls: "bg-rose-600" },
-                  { name: "slate", cls: "bg-slate-900 dark:bg-slate-700" },
-                ].map((c) => (
-                  <div key={c.name} className="space-y-2">
-                    <div className={`h-14 rounded-xl ${c.cls} shadow-sm`} />
-                    <div className="text-xs font-medium capitalize">{c.name}</div>
-                    <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{c.cls}</div>
-                  </div>
+      {/* Testimonial + WhatsApp proof */}
+      <section className="bg-[#FFF1DA] border-b border-[#F3E6D3]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
+            <div className="rounded-[24px] bg-white border border-[#F3E6D3] p-6 sm:p-8 shadow-sm">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="h-4 w-4 fill-[#E85D26] text-[#E85D26]" />
                 ))}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="h-20 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 flex items-center justify-center text-sm font-semibold text-white">from-violet → indigo</div>
-                <div className="h-20 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center text-sm font-semibold text-white">emerald → teal → cyan</div>
-                <div className="h-20 rounded-xl bg-gradient-to-r from-amber-500 to-rose-600 flex items-center justify-center text-sm font-semibold text-white">amber → rose</div>
-              </div>
-            </div>
-          </section>
-
-          {/* Grid & Typography & Spacing */}
-          {(activeTab === "overview" || activeTab === "grid") && (
-            <>
-              <section id="grid" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 p-6">
-                  <h3 className="text-sm font-bold flex items-center gap-2 mb-4"><LayoutGrid className="h-4 w-4 text-violet-600" /> Grid & Flex — responsive test</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Resize window: 1 col on mobile → 2 on md → 3 on lg</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {[1, 2, 3, 4, 5, 6].map((n) => (
-                      <div key={n} className="group relative overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-800 p-4 ring-1 ring-slate-200 dark:ring-slate-700 hover:bg-white dark:hover:bg-slate-700 hover:shadow-md transition">
-                        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/0 via-transparent to-indigo-500/0 group-hover:from-violet-500/5 group-hover:to-indigo-500/5 transition" />
-                        <div className="relative flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex items-center justify-center text-sm font-bold">{n}</div>
-                          <div>
-                            <div className="text-sm font-semibold">Item {n}</div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400">gap-3 • p-4</div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    <div className="flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-violet-600" /> flex</div>
-                    <div className="flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-blue-600" /> grid</div>
-                    <div className="flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-emerald-600" /> gap</div>
-                    <div className="flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-amber-600" /> space-y / space-x</div>
-                    <span className="text-xs text-slate-500 dark:text-slate-400 self-center">— all working</span>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 p-6">
-                  <h3 className="text-sm font-bold flex items-center gap-2 mb-4"><Layers className="h-4 w-4 text-violet-600" /> Spacing & Sizing</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Padding scale (p-2 → p-8)</div>
-                      <div className="flex items-end gap-2">
-                        <div className="h-10 w-10 rounded-lg bg-violet-600 flex items-center justify-center text-white text-xs font-bold p-2">2</div>
-                        <div className="h-12 w-12 rounded-lg bg-violet-600 flex items-center justify-center text-white text-xs font-bold p-4">4</div>
-                        <div className="h-16 w-16 rounded-lg bg-violet-600 flex items-center justify-center text-white text-xs font-bold p-6">6</div>
-                        <div className="h-20 w-20 rounded-lg bg-violet-600 flex items-center justify-center text-white text-xs font-bold p-8">8</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Width fractions</div>
-                      <div className="space-y-2">
-                        <div className="h-6 w-1/4 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600" />
-                        <div className="h-6 w-1/2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600" />
-                        <div className="h-6 w-3/4 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600" />
-                        <div className="h-6 w-full rounded-full bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 flex items-center justify-center text-[11px] font-medium">w-full</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section id="typography" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 p-6">
-                  <h3 className="text-sm font-bold flex items-center gap-2 mb-5"><Type className="h-4 w-4 text-violet-600" /> Typography scale</h3>
-                  <div className="space-y-3">
-                    <div className="text-4xl font-black tracking-tight">4xl • Black</div>
-                    <div className="text-2xl font-bold">2xl • Bold</div>
-                    <div className="text-xl font-semibold">xl • Semibold</div>
-                    <div className="text-base font-medium">base • Medium — The quick brown fox</div>
-                    <div className="text-sm text-slate-600 dark:text-slate-400">sm • Regular — Tailwind resets and scales type correctly.</div>
-                    <div className="text-xs font-mono bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-2">text-xs font-mono — 0 1 2 — tracking-tight leading-relaxed</div>
-                    <div className="pt-3 flex flex-wrap gap-2 text-xs">
-                      <span className="font-bold">bold</span>
-                      <span className="font-semibold">semibold</span>
-                      <span className="italic">italic</span>
-                      <span className="underline">underline</span>
-                      <span className="line-through">line-through</span>
-                      <span className="tracking-widest">tracking-widest</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 p-6">
-                  <h3 className="text-sm font-bold mb-4">Cards & Hover</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { title: "WhatsApp Store", price: "$29", icon: MessageCircle, color: "bg-emerald-500" },
-                      { title: "AI Commerce", price: "$49", icon: Sparkles, color: "bg-violet-600" },
-                      { title: "Analytics Pro", price: "$19", icon: TrendingUp, color: "bg-blue-600" },
-                      { title: "Team Plan", price: "$99", icon: Users, color: "bg-amber-500" },
-                    ].map((card) => (
-                      <div key={card.title} className="group rounded-xl bg-slate-50 dark:bg-slate-800 p-4 ring-1 ring-slate-200 dark:ring-slate-700 hover:bg-white dark:hover:bg-slate-700 hover:shadow-md hover:-translate-y-0.5 transition cursor-pointer">
-                        <div className={`h-9 w-9 rounded-xl ${card.color} flex items-center justify-center text-white shadow-sm`}>
-                          <card.icon className="h-4 w-4" />
-                        </div>
-                        <div className="mt-3 text-sm font-semibold leading-tight">{card.title}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">{card.price}/mo</div>
-                        <div className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-violet-600 dark:text-violet-400 opacity-0 group-hover:opacity-100 transition">View <ChevronRight className="h-3 w-3" /></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-
-              {/* Product/storefront preview */}
-              <section className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-3">
-                  <div className="lg:col-span-2 p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="inline-flex items-center rounded-full bg-slate-900 dark:bg-white px-2.5 py-1 text-xs font-bold text-white dark:text-slate-900">STORE PREVIEW</span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">wabac — WhatsApp AI Commerce</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {[
-                        { name: "Handmade Ceramic Mug", price: "$24.00", rating: "4.9", img: "from-orange-100 to-amber-100 dark:from-orange-950/30 dark:to-amber-950/30", badge: "Bestseller" },
-                        { name: "Linen Tote Bag", price: "$32.00", rating: "4.8", img: "from-emerald-100 to-teal-100 dark:from-emerald-950/30 dark:to-teal-950/30", badge: "New" },
-                        { name: "Scented Candle Set", price: "$18.00", rating: "5.0", img: "from-violet-100 to-indigo-100 dark:from-violet-950/30 dark:to-indigo-950/30", badge: null },
-                      ].map((p) => (
-                        <div key={p.name} className="group rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 hover:shadow-md transition">
-                          <div className={`h-28 bg-gradient-to-br ${p.img} relative flex items-center justify-center`}>
-                            <Package className="h-8 w-8 text-slate-400 dark:text-slate-500" />
-                            {p.badge && <span className="absolute left-2 top-2 rounded-full bg-slate-900 dark:bg-white px-2 py-0.5 text-[11px] font-bold text-white dark:text-slate-900">{p.badge}</span>}
-                            <button className="absolute right-2 top-2 h-7 w-7 rounded-full bg-white dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-rose-500 transition">
-                              <Heart className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                          <div className="p-3">
-                            <div className="text-sm font-semibold leading-tight line-clamp-1">{p.name}</div>
-                            <div className="mt-1 flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400"><Star className="h-3 w-3 fill-current" /> {p.rating} <span className="text-slate-400">• 120 sold</span></div>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="text-sm font-bold">{p.price}</span>
-                              <button className="rounded-full bg-slate-900 dark:bg-white px-3 py-1 text-xs font-semibold text-white dark:text-slate-900 hover:opacity-90 transition">Add</button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-6 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800">
-                    <h4 className="text-sm font-bold flex items-center gap-2"><CreditCard className="h-4 w-4" /> Order summary</h4>
-                    <div className="mt-4 space-y-3 text-sm">
-                      <div className="flex justify-between"><span className="text-slate-600 dark:text-slate-400">Subtotal</span><span className="font-medium">$74.00</span></div>
-                      <div className="flex justify-between"><span className="text-slate-600 dark:text-slate-400">Shipping</span><span className="font-medium text-emerald-600">Free</span></div>
-                      <div className="h-px bg-slate-200 dark:bg-slate-700" />
-                      <div className="flex justify-between text-base font-bold"><span>Total</span><span>$74.00</span></div>
-                    </div>
-                    <button className="mt-5 w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 shadow-sm shadow-emerald-500/20 transition flex items-center justify-center gap-2">
-                      <MessageCircle className="h-4 w-4" /> Checkout on WhatsApp
-                    </button>
-                    <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">Powered by wabac • Tailwind v4</p>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-
-          {/* Pseudo & Animation row */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
-              <h4 className="text-sm font-bold mb-3">Animations & Transitions</h4>
-              <div className="space-y-3">
-                <div className="h-12 rounded-xl bg-violet-600 animate-pulse flex items-center justify-center text-sm font-semibold text-white">animate-pulse</div>
-                <div className="flex gap-3">
-                  <div className="flex-1 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                    <span className="h-6 w-6 rounded-full border-2 border-violet-600 border-t-transparent animate-spin" />
-                  </div>
-                  <div className="flex-1 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-medium hover:scale-105 transition">hover:scale-105</div>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
-              <h4 className="text-sm font-bold mb-3">Borders & Divide</h4>
-              <div className="divide-y divide-slate-200 dark:divide-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                <div className="px-4 py-3 text-sm font-medium flex items-center justify-between">Row 1 <span className="text-xs text-slate-500">divide-y</span></div>
-                <div className="px-4 py-3 text-sm font-medium flex items-center justify-between">Row 2 <span className="h-2 w-2 rounded-full bg-emerald-500" /></div>
-                <div className="px-4 py-3 text-sm font-medium flex items-center justify-between">Row 3 <span className="text-xs text-slate-500">border</span></div>
-              </div>
-              <div className="mt-3 flex gap-2">
-                <div className="flex-1 h-10 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs">dashed</div>
-                <div className="flex-1 h-10 rounded-lg border-2 border-slate-900 dark:border-white flex items-center justify-center text-xs font-medium">solid</div>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-white dark:to-slate-100 p-6 text-white dark:text-slate-900">
-              <h4 className="text-sm font-bold">Filters & Backdrop</h4>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-xl bg-white/10 dark:bg-slate-900/10 backdrop-blur p-3 ring-1 ring-white/20 dark:ring-slate-900/10">
-                  <div className="text-xs font-medium">backdrop-blur</div>
-                  <div className="text-[11px] opacity-70">frosted glass</div>
-                </div>
-                <div className="rounded-xl bg-white dark:bg-slate-900 p-3 shadow-lg">
-                  <div className="text-xs font-bold text-slate-900 dark:text-white">shadow-lg</div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-400">elevation</div>
-                </div>
-              </div>
-              <div className="mt-3 rounded-xl bg-white/10 dark:bg-slate-900/5 p-3 ring-1 ring-white/10 dark:ring-slate-900/10">
-                <div className="text-xs opacity-80">If this card has blur & transparency, filters work.</div>
-              </div>
-            </div>
-          </section>
-
-          {/* Footer CTA */}
-          <section className="relative overflow-hidden rounded-[20px] bg-slate-950 dark:bg-white px-6 py-8 sm:px-10 sm:py-10">
-            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gradient-to-br from-violet-600/30 to-indigo-600/30 blur-3xl" />
-            <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-gradient-to-br from-fuchsia-600/20 to-violet-600/20 blur-3xl" />
-            <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div>
-                <h3 className="text-2xl font-bold text-white dark:text-slate-900 tracking-tight">All utilities passed ✅</h3>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400 dark:text-slate-600">
-                  Colors, spacing, flex, grid, typography, shadows, gradients, transitions, responsive breakpoints, dark mode, hover/focus states — everything is wired. Start building your UI.
+              <div className="relative mt-4">
+                <Quote className="absolute -top-2 -left-2 h-8 w-8 text-[#F3E6D3]" />
+                <p className="relative font-display text-[20px] sm:text-[22px] font-bold leading-tight">
+                  “I used to stay up replying DMs. Now wabac replies in my voice, upsells bundles, and I wake up to paid orders.”
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <code className="rounded-full bg-white/10 dark:bg-slate-900/10 px-3 py-1 text-xs font-mono text-white dark:text-slate-900">npm run dev</code>
-                  <code className="rounded-full bg-white/10 dark:bg-slate-900/10 px-3 py-1 text-xs font-mono text-white dark:text-slate-900">src/index.css → @import "tailwindcss"</code>
-                  <code className="rounded-full bg-violet-600 px-3 py-1 text-xs font-mono text-white">@tailwindcss/vite</code>
+              </div>
+              <div className="mt-6 flex items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="" className="h-10 w-10 rounded-full object-cover" />
+                <div>
+                  <div className="text-sm font-bold">Ngozi A. — Glow by N</div>
+                  <div className="text-xs text-[#6b6b6b]">Beauty seller • 1,842 orders via WhatsApp</div>
+                </div>
+                <span className="ml-auto hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#E6F7F1] px-3 py-1 text-xs font-bold text-[#0B9C74]"><span className="h-2 w-2 rounded-full bg-[#0B9C74] animate-pulse" /> Live on WhatsApp</span>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="rounded-[24px] bg-[#0B2E1F] p-6 text-white overflow-hidden relative">
+                <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-[#0B9C74]/30 blur-2xl" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold flex items-center gap-2"><MessageCircle className="h-4 w-4" /> WhatsApp</span>
+                  <span className="text-xs bg-white/10 px-2 py-1 rounded-full">Today 9:41</span>
+                </div>
+                <div className="mt-6 space-y-3 max-w-[92%]">
+                  <div className="rounded-2xl rounded-bl-sm bg-white text-[#1a1a1a] p-3 text-sm">Hi! I need the Elixir serum — is the SPF one available? 👀</div>
+                  <div className="rounded-2xl rounded-br-sm bg-[#0B9C74] p-3 text-sm ml-auto">Yes! Bundle both for ₦12,500 — free delivery today. Want me to reserve?</div>
+                  <div className="rounded-2xl rounded-bl-sm bg-white text-[#1a1a1a] p-3 text-sm">Add both please. Pay on delivery?</div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-bold text-[#1a1a1a]">Pay on delivery confirmed ✅ <span className="rounded-full bg-[#0B9C74] px-2 py-1 text-white">Order #2841</span></div>
+                </div>
+                <div className="mt-6 flex items-center gap-2 text-xs text-white/70">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" /> AI replies in ~3s • Speaks English, Pidgin & Yoruba
                 </div>
               </div>
-              <div className="flex w-full lg:w-auto gap-3">
-                <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-white dark:bg-slate-900 px-6 py-3 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                  Back to top <ArrowRight className="h-4 w-4 rotate-[-90deg]" />
+              <div className="mt-4 flex justify-center gap-2 text-xs font-bold text-[#6b6b6b]">
+                <span className="hidden sm:inline">No app to download •</span> Works with your existing WhatsApp Business
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="bg-white">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-[34px] lg:text-[40px] font-black tracking-tight leading-none">Simple, fair pricing</h2>
+            <p className="mt-3 text-sm text-[#5a5a5a]">Start free. Grow with you — only pay when you sell. Cancel anytime.</p>
+          </div>
+
+          <div className="mt-10 grid lg:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
+            {[
+              {
+                name: "Starter",
+                price: "Free",
+                sub: "For testing the waters",
+                features: ["50 AI conversations / mo", "20 products", "Basic dashboard", "Community support"],
+                cta: "Start free",
+                featured: false,
+              },
+              {
+                name: "Growth",
+                price: "₦9,500",
+                sub: "/month — most popular",
+                features: ["Unlimited AI chats", "1,000 products", "Broadcasts & coupons", "Paystack & Flutterwave", "Priority support"],
+                cta: "Start 14-day trial",
+                featured: true,
+              },
+              {
+                name: "Scale",
+                price: "Custom",
+                sub: "For teams & wholesalers",
+                features: ["Multi-seller & branches", "API & webhooks", "Dedicated success manager", "SLA & invoicing"],
+                cta: "Contact sales",
+                featured: false,
+              },
+            ].map((tier) => (
+              <div key={tier.name} className={`rounded-[22px] border p-6 flex flex-col ${tier.featured ? "bg-[#1a1a1a] text-white border-[#1a1a1a] shadow-[0_20px_40px_rgba(0,0,0,0.15)] scale-[1.02]" : "bg-[#FFFBF5] border-[#F3E6D3]"}`}>
+                <div className="text-sm font-bold tracking-widest flex items-center gap-2">
+                  {tier.name} {tier.featured && <span className="rounded-full bg-[#0B9C74] px-2 py-0.5 text-[11px] text-white">POPULAR</span>}
+                </div>
+                <div className="mt-3 font-display text-[32px] font-black leading-none">{tier.price}</div>
+                <div className={`text-xs ${tier.featured ? "text-white/60" : "text-[#6b6b6b]"}`}>{tier.sub}</div>
+                <ul className="mt-6 space-y-3 text-sm flex-1">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex gap-2">
+                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${tier.featured ? "text-[#0B9C74]" : "text-[#0B9C74]"}`} />
+                      <span className={tier.featured ? "text-white/90" : "text-[#2b2b2b]"}>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button className={`mt-6 w-full rounded-full py-3 text-sm font-bold transition ${tier.featured ? "bg-[#0B9C74] text-white hover:bg-[#0a8a66]" : "bg-white border border-[#F3E6D3] hover:bg-[#FFF1DA] text-[#1a1a1a]"}`}>
+                  {tier.cta}
                 </button>
               </div>
-            </div>
-          </section>
-
-          <p className="text-center text-xs text-slate-400 dark:text-slate-500 pb-4">
-            wabac • WhatsApp AI Commerce Platform • Tailwind CSS v4.3.3 • Vite + React • Built with <span className="text-rose-500">♥</span> — edit <code className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 font-mono">src/App.tsx</code> to continue.
-          </p>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Final CTA */}
+      <section id="start" className="bg-[#E85D26]">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+          <div className="rounded-[24px] bg-white p-6 sm:p-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div>
+              <h3 className="font-display text-[28px] lg:text-[36px] font-black leading-none tracking-tight">Open your WhatsApp store today.</h3>
+              <p className="mt-3 max-w-[560px] text-sm leading-6 text-[#5a5a5a]">Import from Instagram or catalog in minutes. Your AI starts selling while you sleep — you keep the profit.</p>
+              <div className="mt-2 flex items-center gap-4 text-xs font-bold text-[#6b6b6b]">
+                <span className="inline-flex items-center gap-1"><Check className="h-4 w-4 text-[#0B9C74]" /> No card required</span>
+                <span className="inline-flex items-center gap-1"><Check className="h-4 w-4 text-[#0B9C74]" /> 2-min setup</span>
+              </div>
+            </div>
+            <div className="flex w-full lg:w-auto flex-col sm:flex-row gap-3">
+              <a href="#" className="inline-flex justify-center items-center gap-2 rounded-full bg-[#0B9C74] px-8 py-4 text-sm font-bold text-white shadow-lg hover:bg-[#0a8a66] transition">
+                Start selling free <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href="#" className="inline-flex justify-center items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-8 py-4 text-sm font-bold hover:bg-[#FFF1DA] transition">
+                Talk to founder
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#1a1a1a] text-white">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-8">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="h-8 w-8 rounded-lg bg-white text-[#1a1a1a] grid place-items-center font-black text-sm">W</span>
+                <span className="font-display font-black text-lg">wabac</span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-white/60 max-w-[320px]">WhatsApp AI Commerce for African sellers. Sell where your customers chat.</p>
+              <div className="mt-4 flex gap-2">
+                <a href="#" className="h-8 w-8 rounded-full bg-white/10 grid place-items-center hover:bg-white/20 transition"><Share2 className="h-4 w-4" /></a>
+                <a href="#" className="h-8 w-8 rounded-full bg-white/10 grid place-items-center hover:bg-white/20 transition"><Mail className="h-4 w-4" /></a>
+                <a href="#" className="h-8 w-8 rounded-full bg-white/10 grid place-items-center hover:bg-white/20 transition"><Globe className="h-4 w-4" /></a>
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-bold">Product</div>
+              <ul className="mt-3 space-y-2 text-sm text-white/60">
+                <li><a href="#" className="hover:text-white">Features</a></li>
+                <li><a href="#" className="hover:text-white">Marketplace</a></li>
+                <li><a href="#" className="hover:text-white">Pricing</a></li>
+                <li><a href="#" className="hover:text-white">WhatsApp API</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-sm font-bold">Company</div>
+              <ul className="mt-3 space-y-2 text-sm text-white/60">
+                <li><a href="#" className="hover:text-white">About</a></li>
+                <li><a href="#" className="hover:text-white">Careers</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><a href="#" className="hover:text-white">Privacy & Terms</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-sm font-bold">Get updates</div>
+              <p className="mt-3 text-sm text-white/60">New sellers, tips & promo codes. No spam.</p>
+              <form onSubmit={(e) => e.preventDefault()} className="mt-3 flex gap-2">
+                <input placeholder="Your WhatsApp or email" className="flex-1 rounded-full bg-white/10 border border-white/10 px-4 py-2.5 text-sm placeholder:text-white/40 focus:outline-none focus:border-[#0B9C74]" />
+                <button className="rounded-full bg-[#0B9C74] px-5 py-2.5 text-sm font-bold hover:bg-[#0a8a66] transition">Join</button>
+              </form>
+            </div>
+          </div>
+          <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
+            <span>© 2026 wabac — Built in Port Harcourt for sellers everywhere.</span>
+            <span>Made with ♥ for WhatsApp</span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
-
-export default App

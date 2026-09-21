@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,800;9..144,0,900&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
 }
 
 * {
@@ -15,7 +17,11 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: #020617;
-  color: #0f172a;
+  background: #FFFBF5;
+  color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
