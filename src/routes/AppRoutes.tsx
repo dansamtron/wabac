@@ -14,6 +14,7 @@ import Revenue from "../pages/dashboard/Revenue"
 import WhatsAppPage from "../pages/whatsapp/WhatsApp"
 import Storefront from "../pages/storefront/Storefront"
 import ProductDetail from "../pages/storefront/ProductDetail"
+import SellerStorefront from "../pages/storefront/SellerStorefront"
 import { DashboardLayout } from "../layouts/DashboardLayout"
 import { AdminLayout } from "../layouts/AdminLayout"
 import { PublicLayout } from "../layouts/PublicLayout"
@@ -69,6 +70,8 @@ export function AppRoutes() {
       <Route element={<PublicLayout />}>
         <Route path="/store" element={<Storefront />} />
         <Route path="/store/:id" element={<ProductDetail />} />
+        <Route path="/store/seller/:sellerId" element={<SellerStorefront />} />
+        <Route path="/s/:sellerId" element={<SellerStorefront />} />
         <Route path="/marketplace" element={<Storefront />} />
 
         <Route path="/about" element={<About />} />
