@@ -4,6 +4,7 @@ import { Store, MapPin, Phone, MessageCircle, Share2, Star, ShoppingBag, ArrowLe
 import { productService } from "../../services/productService"
 import { useSEO } from "../../hooks/useSEO"
 import type { Product } from "../../types/product"
+import { getEffectivePrice, getDisplayPrice, getTotalStock } from "../../types/product"
 import type { Seller } from "../../types/auth"
 import type { Business } from "../../types/business"
 
@@ -146,7 +147,7 @@ export default function SellerStorefront() {
                   <div className="p-3.5">
                     <Link to={`/store/${p.id}`} className="text-[13px] font-bold leading-tight line-clamp-1 hover:text-[#0B9C74]">{p.name}</Link>
                     <div className="mt-1 text-xs text-[#6b6b6b] line-clamp-1">{p.description.slice(0, 48)}</div>
-                    <div className="mt-2 flex items-center justify-between"><span className="text-sm font-bold">₦{p.price.toLocaleString()}</span><span className={`rounded-full px-2 py-1 text-xs font-bold border ${p.stock === 0 ? "bg-red-50 text-red-700 border-red-200" : "bg-[#E6F7F1] text-[#0B9C74] border-[#0B9C74]/20"}`}>{p.stock === 0 ? "Out" : `${p.stock} left`}</span></div>
+                    <div className="mt-2 flex items-center justify-between">{(() => { const d = getDisplayPrice(p); const ep = getEffectivePrice(p); const stock = getTotalStock(p); return <><span className="text-sm font-bold">{d.hasDiscount ? <><span className="text-[#E85D26]">₦{ep.toLocaleString()}</span> <span className="text-xs line-through text-[#9a9a9a]">₦{d.original.toLocaleString()}</span></> : `₦${ep.toLocaleString()}`}</span><span className={`rounded-full px-2 py-1 text-xs font-bold border ${stock === 0 ? "bg-red-50 text-red-700 border-red-200" : "bg-[#E6F7F1] text-[#0B9C74] border-[#0B9C74]/20"}`}>{stock === 0 ? "Out" : `${stock} left`}</span></> })()}</div>
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       <Link to={`/store/${p.id}`} className="inline-flex justify-center items-center gap-1 rounded-full bg-[#1a1a1a] px-3 py-2 text-xs font-bold text-white hover:bg-black"><ShoppingBag className="h-3 w-3" /> View</Link>
                       <a href={waLink(p)} target="_blank" rel="noreferrer" className="inline-flex justify-center items-center gap-1 rounded-full bg-[#0B9C74] px-3 py-2 text-xs font-bold text-white hover:bg-[#0a8a66]"><MessageCircle className="h-3 w-3" /> WhatsApp</a>

@@ -5,6 +5,8 @@ import { validateCustomer, validateOrderItems, sanitize, clampRequestSize } from
 import { rateLimited } from "./rateLimitService"
 import { logger } from "./logger"
 import { getIdempotencyKey, getIdempotentResponse, setIdempotentResponse } from "../utils/idempotency"
+import { getEffectivePrice } from "../types/product"
+import type { Product } from "../types/product"
 
 const STORAGE_KEY = "cognicart_orders"
 const PRODUCT_KEY = "cognicart_products"
@@ -26,7 +28,6 @@ function getOrders(): Order[] {
 }
 
 function saveOrders(orders: Order[]) {
-  // Simulate DB index on sellerId + createdAt (logged)
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders))
 }
 
@@ -42,7 +43,6 @@ export const orderService = {
       return data
     } catch (error) {
       if (!isMockMode(error)) throw error
-      // Tenant isolation: WHERE sellerId = authenticatedSellerId
       const sellerId = getSellerId()
       let orders = getOrders().filter((o) => o.sellerId === sellerId)
       if (params?.status) orders = orders.filter((o) => o.orderStatus === params.status)
@@ -54,7 +54,7 @@ export const orderService = {
             o.id.toLowerCase().includes(q) ||
             o.customerName.toLowerCase().includes(q) ||
             o.customerPhone.includes(q) ||
-            o.items.some((i) => i.name.toLowerCase().includes(q))
+            o.items.some((i) => i.name.toLowerCase().includes(q) || (i.variantLabel || "").toLowerCase().includes(q))
         )
       }
       logger.debug("orderService:list", { sellerId, count: orders.length })
@@ -81,15 +81,12 @@ export const orderService = {
   },
 
   async create(payload: CreateOrderPayload): Promise<Order> {
-    // Rate limiting: 10 orders per minute per seller
     rateLimited(`orders:create:${getSellerId()}`, 10, 60 * 1000)
-    // Input validation
     validateCustomer(payload.customer)
     validateOrderItems(payload.items)
     if (payload.deliveryAddress) sanitize(payload.deliveryAddress, 200)
     clampRequestSize(JSON.stringify(payload), 100)
 
-    // Idempotency: prevent duplicate order on double submit / retry
     const idemKey = getIdempotencyKey({ customer: payload.customer, items: payload.items, deliveryAddress: payload.deliveryAddress })
     const cached = getIdempotentResponse<Order>(idemKey)
     if (cached) {
@@ -104,7 +101,7 @@ export const orderService = {
       return data
     } catch (error) {
       if (!isMockMode(error)) throw error
-      let products: Array<{ id: string; sellerId: string; name: string; price: number; stock: number; images: string[] }> = []
+      let products: Product[] = []
       try {
         products = JSON.parse(localStorage.getItem(PRODUCT_KEY) || "[]")
       } catch {
@@ -117,8 +114,7 @@ export const orderService = {
       })()
       const sellerId = inferredSellerId
 
-      // Tenant check: ensure products belong to inferred seller (prevent cross-seller injection)
-      const orderItems = payload.items.map(({ productId, quantity }) => {
+      const orderItems = payload.items.map(({ productId, quantity, variantId }) => {
         let prod = products.find((p) => p.id === productId && p.sellerId === sellerId)
         if (!prod) prod = products.find((p) => p.id === productId)
         if (!prod) {
@@ -130,14 +126,35 @@ export const orderService = {
           throw new Error("Cross-seller product not allowed")
         }
         if (!Number.isInteger(quantity) || quantity <= 0) throw new Error(`Invalid quantity for ${prod.name}`)
-        if (prod.stock < quantity) throw new Error(`Insufficient stock for ${prod.name}. Available ${prod.stock}`)
+        let variant = null as Product["variants"] extends (infer U)[] | undefined ? U | null : never
+        let variantLabel: string | undefined
+        let stockAvailable: number
+        let unitPrice: number
+        if (variantId) {
+          if (!prod.variants || prod.variants.length === 0) throw new Error(`${prod.name} has no variants`)
+          // @ts-ignore
+          variant = prod.variants.find((v) => v.id === variantId)
+          if (!variant) throw new Error(`Variant not found for ${prod.name}`)
+          stockAvailable = variant.stock
+          unitPrice = getEffectivePrice(prod, variant as never)
+          variantLabel = [variant.size, variant.color, variant.sku].filter(Boolean).join(" / ")
+        } else {
+          if (prod.variants && prod.variants.length > 0) {
+            throw new Error(`${prod.name} requires size/color selection. Choose a variant.`)
+          }
+          stockAvailable = prod.stock
+          unitPrice = getEffectivePrice(prod)
+        }
+        if (stockAvailable < quantity) throw new Error(`Insufficient stock for ${prod.name}${variantLabel ? ` (${variantLabel})` : ""}. Available ${stockAvailable}`)
         return {
           productId: prod.id,
+          variantId: variantId || undefined,
+          variantLabel,
           name: prod.name,
-          price: prod.price,
+          price: unitPrice,
           quantity,
-          image: prod.images[0],
-          subtotal: prod.price * quantity,
+          image: (variant as unknown as { image?: string })?.image || prod.images[0],
+          subtotal: unitPrice * quantity,
         }
       })
 
@@ -173,10 +190,21 @@ export const orderService = {
         updatedAt: now,
       }
 
-      const updatedProducts = products.map((p) => {
-        const item = orderItems.find((i) => i.productId === p.id)
-        if (item) return { ...p, stock: p.stock - item.quantity, updatedAt: now }
-        return p
+      const updatedProducts: Product[] = products.map((p) => {
+        // find all items for this product
+        const itemsForProd = orderItems.filter((i) => i.productId === p.id)
+        if (itemsForProd.length === 0) return p
+        if (p.variants && p.variants.length > 0) {
+          const newVariants = p.variants.map((v) => {
+            const it = itemsForProd.find((i) => i.variantId === v.id)
+            if (it) return { ...v, stock: v.stock - it.quantity }
+            return v
+          })
+          const newStock = newVariants.reduce((s, v) => s + v.stock, 0)
+          return { ...p, variants: newVariants, stock: newStock, updatedAt: now }
+        }
+        const qty = itemsForProd.reduce((s, i) => s + i.quantity, 0)
+        return { ...p, stock: p.stock - qty, updatedAt: now }
       })
       localStorage.setItem(PRODUCT_KEY, JSON.stringify(updatedProducts))
 
@@ -220,7 +248,6 @@ export const orderService = {
     let idx = all.findIndex((o) => o.id === id && o.sellerId === getSellerId())
     if (idx === -1) idx = all.findIndex((o) => o.id === id)
     if (idx === -1) throw new Error("Order not found")
-    // Protect: don't allow cross-seller payment update without verification
     const sellerId = getSellerId()
     if (all[idx].sellerId !== sellerId && sellerId !== "mock_seller") {
       logger.warn("orderService:updatePaymentStatus cross-seller", { id, orderSeller: all[idx].sellerId, sellerId })
@@ -250,14 +277,20 @@ export const orderService = {
     const existing = getOrders().filter((o) => o.sellerId === sellerId)
     if (existing.length > 0) return
     customerService.seedDemo()
-    let products: Array<{ id: string; sellerId: string; name: string; price: number; stock: number; images: string[] }> = []
+    let products: Product[] = []
     try {
-      products = JSON.parse(localStorage.getItem(PRODUCT_KEY) || "[]").filter((p: { sellerId: string }) => p.sellerId === sellerId)
+      products = JSON.parse(localStorage.getItem(PRODUCT_KEY) || "[]").filter((p: Product) => p.sellerId === sellerId)
     } catch {
       products = []
     }
     if (products.length === 0) return
     const now = Date.now()
+    // use effective price for demo orders
+    const p0 = products[0]
+    const p1 = products[1]
+    const price0 = getEffectivePrice(p0)
+    const varId = p1.variants && p1.variants[0] ? p1.variants[0].id : undefined
+    const price1 = p1.variants && p1.variants[0] ? getEffectivePrice(p1, p1.variants[0]) : getEffectivePrice(p1)
     const demoOrders: Order[] = [
       {
         id: "ord_demo1",
@@ -268,12 +301,12 @@ export const orderService = {
         customerWhatsappId: "+2348030000001",
         deliveryAddress: "12 Allen Avenue, Ikeja, Lagos",
         items: [
-          { productId: products[0].id, name: products[0].name, price: products[0].price, quantity: 1, image: products[0].images[0], subtotal: products[0].price },
-          { productId: products[1].id, name: products[1].name, price: products[1].price, quantity: 1, image: products[1].images[0], subtotal: products[1].price },
+          { productId: p0.id, name: p0.name, price: price0, quantity: 1, image: p0.images[0], subtotal: price0 },
+          { productId: p1.id, variantId: varId, variantLabel: p1.variants?.[0] ? `${p1.variants[0].size} / ${p1.variants[0].color}` : undefined, name: p1.name, price: price1, quantity: 1, image: p1.images[0], subtotal: price1 },
         ],
-        subtotal: products[0].price + products[1].price,
+        subtotal: price0 + price1,
         deliveryFee: 1500,
-        total: products[0].price + products[1].price + 1500,
+        total: price0 + price1 + 1500,
         paymentStatus: "Paid",
         orderStatus: "Processing",
         createdAt: new Date(now - 86400000 * 2).toISOString(),
@@ -287,10 +320,10 @@ export const orderService = {
         customerPhone: "+2348020000002",
         customerWhatsappId: "+2348020000002",
         deliveryAddress: "5 Aba Road, Port Harcourt",
-        items: [{ productId: products[0].id, name: products[0].name, price: products[0].price, quantity: 2, image: products[0].images[0], subtotal: products[0].price * 2 }],
-        subtotal: products[0].price * 2,
+        items: [{ productId: p0.id, name: p0.name, price: price0, quantity: 2, image: p0.images[0], subtotal: price0 * 2 }],
+        subtotal: price0 * 2,
         deliveryFee: 0,
-        total: products[0].price * 2,
+        total: price0 * 2,
         paymentStatus: "Pending",
         orderStatus: "Pending",
         createdAt: new Date(now - 3600000 * 5).toISOString(),
@@ -304,10 +337,10 @@ export const orderService = {
         customerPhone: "+2348030000001",
         customerWhatsappId: "+2348030000001",
         deliveryAddress: "12 Allen Avenue, Ikeja, Lagos",
-        items: [{ productId: products[Math.min(2, products.length - 1)].id, name: products[Math.min(2, products.length - 1)].name, price: products[Math.min(2, products.length - 1)].price, quantity: 1, image: products[Math.min(2, products.length - 1)].images[0], subtotal: products[Math.min(2, products.length - 1)].price }],
-        subtotal: products[Math.min(2, products.length - 1)].price,
+        items: [{ productId: products[Math.min(2, products.length - 1)].id, name: products[Math.min(2, products.length - 1)].name, price: getEffectivePrice(products[Math.min(2, products.length - 1)]), quantity: 1, image: products[Math.min(2, products.length - 1)].images[0], subtotal: getEffectivePrice(products[Math.min(2, products.length - 1)]) }],
+        subtotal: getEffectivePrice(products[Math.min(2, products.length - 1)]),
         deliveryFee: 1500,
-        total: products[Math.min(2, products.length - 1)].price + 1500,
+        total: getEffectivePrice(products[Math.min(2, products.length - 1)]) + 1500,
         paymentStatus: "Paid",
         orderStatus: "Delivered",
         createdAt: new Date(now - 86400000 * 7).toISOString(),

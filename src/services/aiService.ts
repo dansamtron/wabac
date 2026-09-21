@@ -3,6 +3,7 @@ import api from "./api"
 import { rateLimited } from "./rateLimitService"
 import { logger } from "./logger"
 import { sanitize } from "../utils/validation"
+import { getEffectivePrice, getTotalStock } from "../types/product"
 
 const CONTEXT_KEY = (sellerId: string, customerPhone: string) => `cognicart_ai_ctx_${sellerId}_${customerPhone}`
 const AI_ENABLED_KEY = (sellerId: string) => `cognicart_ai_enabled_${sellerId}`
@@ -61,14 +62,14 @@ async function toolSearchProducts(sellerId: string, args: { query: string; limit
   if (args.limit !== undefined && (typeof args.limit !== "number" || args.limit < 1 || args.limit > 20)) throw new Error("Invalid limit")
   try {
     const prodRaw = localStorage.getItem("cognicart_products")
-    const all = prodRaw ? (JSON.parse(prodRaw) as Array<{ sellerId: string; isActive: boolean; id: string; name: string; description: string; price: number; stock: number; category: string; images: string[] }>) : []
+    const all = prodRaw ? (JSON.parse(prodRaw) as Array<{ sellerId: string; isActive: boolean; id: string; name: string; description: string; price: number; stock: number; category: string; images: string[]; discount?: import("../types/product").ProductDiscount; variants?: import("../types/product").ProductVariant[] }>) : []
     let filtered = all.filter((p) => p.sellerId === sellerId && p.isActive)
     if (args.query) {
       const q = sanitize(args.query, 200).toLowerCase()
-      filtered = filtered.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+      filtered = filtered.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || (p.variants || []).some((v) => `${v.size} ${v.color} ${v.sku}`.toLowerCase().includes(q)))
     }
     const limit = Math.min(args.limit || 5, 10)
-    return filtered.slice(0, limit).map((p) => ({ id: p.id, name: p.name, price: p.price, stock: p.stock, category: p.category, description: p.description }))
+    return filtered.slice(0, limit).map((p) => ({ id: p.id, name: p.name, price: getEffectivePrice(p as never), originalPrice: p.price, hasDiscount: !!(p.discount?.active && getEffectivePrice(p as never) < p.price), stock: getTotalStock(p as never), category: p.category, description: p.description, variants: p.variants }))
   } catch {
     return []
   }
@@ -77,16 +78,18 @@ async function toolSearchProducts(sellerId: string, args: { query: string; limit
 async function toolGetProduct(sellerId: string, args: { productId: string }) {
   if (!args.productId || typeof args.productId !== "string" || args.productId.length > 100) throw new Error("Invalid productId")
   const prodRaw = localStorage.getItem("cognicart_products")
-  const all = prodRaw ? (JSON.parse(prodRaw) as Array<{ sellerId: string; id: string; name: string; description: string; price: number; stock: number; category: string; images: string[]; isActive: boolean }>) : []
+  const all = prodRaw ? (JSON.parse(prodRaw) as Array<{ sellerId: string; id: string; name: string; description: string; price: number; stock: number; category: string; images: string[]; isActive: boolean; discount?: import("../types/product").ProductDiscount; variants?: import("../types/product").ProductVariant[] }>) : []
   const prod = all.find((p) => p.id === args.productId)
   if (!prod) throw new Error("Product not found")
   assertSellerOwns(sellerId, prod.sellerId, "product")
-  return prod
+  return prod as unknown as { id: string; name: string; description: string; price: number; stock: number; category: string; images: string[]; isActive: boolean; sellerId: string; discount?: import("../types/product").ProductDiscount; variants?: import("../types/product").ProductVariant[] }
 }
 
 async function toolCheckStock(sellerId: string, args: { productId: string }) {
-  const prod = await toolGetProduct(sellerId, args)
-  return { productId: prod.id, name: prod.name, stock: prod.stock, price: prod.price, available: prod.stock > 0 }
+  const prod = await toolGetProduct(sellerId, args) as unknown as { id: string; name: string; stock: number; price: number; discount?: import("../types/product").ProductDiscount; variants?: import("../types/product").ProductVariant[] }
+  const effective = getEffectivePrice(prod as never)
+  const total = getTotalStock(prod as never)
+  return { productId: prod.id, name: prod.name, stock: total, price: effective, originalPrice: prod.price, hasDiscount: effective < prod.price, available: total > 0, variants: prod.variants }
 }
 
 async function toolGetBusinessInfo(sellerId: string) {
@@ -101,15 +104,26 @@ async function toolGetBusinessInfo(sellerId: string) {
   return { name: getBusinessName(sellerId), deliveryInfo: "Lagos 1-2 days, outside Lagos 2-4 days", deliveryFee: 1500, paymentMethod: "both" }
 }
 
-async function toolCalculateOrderTotal(sellerId: string, args: { items: Array<{ productId: string; quantity: number }>; deliveryFee?: number }) {
+async function toolCalculateOrderTotal(sellerId: string, args: { items: Array<{ productId: string; quantity: number; variantId?: string }>; deliveryFee?: number }) {
   if (!Array.isArray(args.items) || args.items.length === 0 || args.items.length > 10) throw new Error("Invalid items")
   if (args.deliveryFee !== undefined && (typeof args.deliveryFee !== "number" || args.deliveryFee < 0 || args.deliveryFee > 100000)) throw new Error("Invalid deliveryFee")
   let subtotal = 0
   for (const item of args.items) {
     if (!item.productId || typeof item.quantity !== "number" || item.quantity < 1 || item.quantity > 99) throw new Error("Invalid item")
-    const prod = await toolGetProduct(sellerId, { productId: item.productId })
-    if (prod.stock < item.quantity) throw new Error(`Insufficient stock for ${prod.name}`)
-    subtotal += prod.price * item.quantity
+    const prod = await toolGetProduct(sellerId, { productId: item.productId }) as unknown as { id: string; name: string; price: number; stock: number; discount?: import("../types/product").ProductDiscount; variants?: import("../types/product").ProductVariant[] }
+    let v = null as import("../types/product").ProductVariant | null | undefined
+    if ((item as { variantId?: string }).variantId) {
+      const vid = (item as { variantId?: string }).variantId!
+      v = prod.variants?.find((x) => x.id === vid) || null
+      if (!v) throw new Error(`Variant not found for ${prod.name}`)
+      if (v.stock < item.quantity) throw new Error(`Insufficient stock for ${prod.name} (${v.size || ""} ${v.color || ""})`)
+    } else {
+      if (prod.variants && prod.variants.length > 0) throw new Error(`${prod.name} requires variant selection`)
+      const total = getTotalStock(prod as never)
+      if (total < item.quantity) throw new Error(`Insufficient stock for ${prod.name}`)
+    }
+    const unit = getEffectivePrice(prod as never, v as never)
+    subtotal += unit * item.quantity
   }
   const deliveryFee = args.deliveryFee ?? (subtotal > 20000 ? 0 : 1500)
   return { subtotal, deliveryFee, total: subtotal + deliveryFee }

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, ShoppingBag, Heart, Check, Truck, Shield, Share2, Copy, MessageCircle, Store, ChevronRight } from "lucide-react"
+import { ArrowLeft, ShoppingBag, Heart, Check, Truck, Shield, Share2, Copy, MessageCircle, Store, ChevronRight, Tag, Palette } from "lucide-react"
 import { productService } from "../../services/productService"
 import { useSEO } from "../../hooks/useSEO"
 import type { Product } from "../../types/product"
+import { getEffectivePrice, getDisplayPrice, getTotalStock } from "../../types/product"
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>()
@@ -14,6 +15,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true)
   const [added, setAdded] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -21,7 +23,7 @@ export default function ProductDetail() {
     productService.getById(id).then((p) => {
       setProduct(p)
       setSellerId(p.sellerId)
-      // lookup seller business
+      if (p.variants && p.variants.length > 0) setSelectedVariant(p.variants[0].id)
       try {
         const sellersRaw = localStorage.getItem("cognicart_mock_sellers")
         const sellers = sellersRaw ? JSON.parse(sellersRaw) : []
@@ -38,9 +40,16 @@ export default function ProductDetail() {
     }).catch(() => setProduct(null)).finally(() => setLoading(false))
   }, [id])
 
+  const variant = product?.variants?.find((v) => v.id === selectedVariant) || null
+  const effectivePrice = product ? getEffectivePrice(product, variant) : 0
+  const display = product ? getDisplayPrice(product) : { original: 0, sale: null, hasDiscount: false }
+  const totalStock = product ? getTotalStock(product) : 0
+  const variantStock = variant ? variant.stock : totalStock
+  const isOut = variant ? variant.stock === 0 : totalStock === 0
+
   const url = typeof window !== "undefined" ? window.location.href : `https://cognicart.ng/store/${id}`
-  const title = product ? `${product.name} — ₦${product.price.toLocaleString()} | ${sellerName} on Cognicart` : "Product — Cognicart"
-  const desc = product ? `${product.description.slice(0, 155)} • ${product.category} • ${product.stock > 0 ? `In stock ${product.stock}` : "Out of stock"} • Order on WhatsApp in one message.` : "Product on Cognicart"
+  const title = product ? `${product.name} — ₦${effectivePrice.toLocaleString()}${display.hasDiscount ? ` (was ₦${display.original.toLocaleString()})` : ""} | ${sellerName} on Cognicart` : "Product — Cognicart"
+  const desc = product ? `${product.description.slice(0, 155)} • ${product.category}${product.variants ? ` • ${product.variants.length} variants` : ""} • ${totalStock > 0 ? `In stock ${totalStock}` : "Out of stock"} • Order on WhatsApp in one message.` : "Product on Cognicart"
   const ogImage = product?.images[0] || "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=1200&h=630&fit=crop"
 
   useSEO({
@@ -61,9 +70,9 @@ export default function ProductDetail() {
       brand: { "@type": "Brand", name: sellerName },
       offers: {
         "@type": "Offer",
-        price: product.price,
+        price: effectivePrice,
         priceCurrency: product.currency || "NGN",
-        availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        availability: variantStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
         url,
         seller: { "@type": "Organization", name: sellerName },
       },
@@ -72,10 +81,18 @@ export default function ProductDetail() {
 
   const handleAdd = () => {
     if (!product) return
+    if (product.variants && product.variants.length > 0 && !selectedVariant) {
+      alert("Please select size and color")
+      return
+    }
+    if (isOut) return
     const raw = localStorage.getItem("cognicart_cart")
-    const cart: string[] = raw ? JSON.parse(raw) : []
-    cart.push(product.id)
-    localStorage.setItem("cognicart_cart", JSON.stringify(cart))
+    let cart: Array<string | { productId: string; variantId?: string }>
+    try { cart = raw ? JSON.parse(raw) : [] } catch { cart = [] }
+    // normalize to objects
+    const normalized: Array<{ productId: string; variantId?: string }> = cart.map((c: unknown) => typeof c === "string" ? { productId: c } : c as { productId: string; variantId?: string })
+    normalized.push({ productId: product.id, variantId: selectedVariant || undefined })
+    localStorage.setItem("cognicart_cart", JSON.stringify(normalized))
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
@@ -86,7 +103,9 @@ export default function ProductDetail() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const waLink = product ? `https://wa.me/${sellerPhone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${sellerName}, is ${product.name} still available for ₦${product.price.toLocaleString()}? ${url}`)}` : "#"
+  const variantLabel = variant ? [variant.size, variant.color].filter(Boolean).join(" / ") || variant.sku || "" : ""
+  const waText = product ? `Hi ${sellerName}, is ${product.name}${variantLabel ? ` (${variantLabel})` : ""} still available for ₦${effectivePrice.toLocaleString()}? ${url}` : ""
+  const waLink = `https://wa.me/${sellerPhone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waText)}`
 
   if (loading) return <div className="min-h-[50vh] grid place-items-center"><div className="h-8 w-8 rounded-full border-2 border-[#0B9C74] border-t-transparent animate-spin" /></div>
   if (!product) return <div className="min-h-[50vh] grid place-items-center px-4"><div className="text-center"><div className="font-bold">Product not found</div><Link to="/store" className="mt-3 inline-flex rounded-full bg-[#0B9C74] px-5 py-2.5 text-sm font-bold text-white">Back to store</Link></div></div>
@@ -105,7 +124,7 @@ export default function ProductDetail() {
 
         <div className="mt-6 grid lg:grid-cols-2 gap-8">
           <div className="rounded-[22px] bg-white border border-[#F3E6D3] p-4">
-            <div className="aspect-square rounded-2xl bg-[#FFFBF5] border border-[#F3E6D3] p-6 flex items-center justify-center"><img src={product.images[0]} alt={product.name} className="h-full w-full object-contain mix-blend-multiply" /></div>
+            <div className="aspect-square rounded-2xl bg-[#FFFBF5] border border-[#F3E6D3] p-6 flex items-center justify-center"><img src={variant?.image || product.images[0]} alt={product.name} className="h-full w-full object-contain mix-blend-multiply" /></div>
             {product.images.length > 1 && <div className="mt-3 grid grid-cols-4 gap-3">{product.images.slice(1, 4).map((src, i) => <img key={i} src={src} alt="" className="h-20 w-full rounded-xl object-cover border border-[#F3E6D3] bg-white" />)}</div>}
             <div className="mt-4 flex gap-2">
               <a href={waLink} target="_blank" rel="noreferrer" className="flex-1 inline-flex justify-center items-center gap-2 rounded-full bg-[#0B9C74] px-4 py-3 text-sm font-bold text-white hover:bg-[#0a8a66]"><MessageCircle className="h-4 w-4" /> Order on WhatsApp</a>
@@ -121,11 +140,47 @@ export default function ProductDetail() {
               <a href={waLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-full bg-[#E6F7F1] border border-[#0B9C74]/20 px-3 py-1 font-bold text-[#0B9C74]">Chat seller</a>
             </div>
             <p className="mt-3 text-sm leading-6 text-[#5a5a5a]">{product.description}</p>
-            <div className="mt-4 flex items-baseline gap-3"><span className="text-2xl font-bold">₦{product.price.toLocaleString()}</span><span className={`rounded-full px-2.5 py-1 text-xs font-bold border ${product.stock === 0 ? "bg-red-50 text-red-700 border-red-200" : product.stock <= 5 ? "bg-[#FFF1DA] text-[#E85D26] border-[#F3E6D3]" : "bg-[#E6F7F1] text-[#0B9C74] border-[#0B9C74]/20"}`}>{product.stock === 0 ? "Out of stock" : `In stock: ${product.stock}`}</span></div>
+
+            <div className="mt-4">
+              {display.hasDiscount ? (
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <span className="text-2xl font-bold text-[#E85D26]">₦{effectivePrice.toLocaleString()}</span>
+                  <span className="text-sm line-through text-[#9a9a9a]">₦{display.original.toLocaleString()}</span>
+                  <span className="rounded-full bg-[#E85D26] text-white px-2.5 py-1 text-xs font-bold flex items-center gap-1"><Tag className="h-3 w-3" /> {product.discount?.type === "percentage" ? `${product.discount.value}% OFF` : `Save ₦${product.discount?.value.toLocaleString()}`}</span>
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-3"><span className="text-2xl font-bold">₦{effectivePrice.toLocaleString()}</span>{variant?.price ? <span className="text-xs text-[#6b6b6b]">variant price</span> : null}</div>
+              )}
+              <div className="mt-2 flex items-center gap-2">
+                <span className={`rounded-full px-2.5 py-1 text-xs font-bold border ${variantStock === 0 ? "bg-red-50 text-red-700 border-red-200" : variantStock <= 5 ? "bg-[#FFF1DA] text-[#E85D26] border-[#F3E6D3]" : "bg-[#E6F7F1] text-[#0B9C74] border-[#0B9C74]/20"}`}>{variantStock === 0 ? "Out of stock" : `In stock: ${variantStock}`}</span>
+                {!isOut && <span className="text-xs text-[#6b6b6b]">Total {totalStock} units</span>}
+              </div>
+            </div>
+
+            {product.variants && product.variants.length > 0 && (
+              <div className="mt-6 rounded-2xl bg-white border border-[#F3E6D3] p-4">
+                <div className="flex items-center gap-2 text-sm font-bold"><Palette className="h-4 w-4" /> Choose size and color</div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  {product.variants.map((v) => {
+                    const label = [v.size, v.color].filter(Boolean).join(" / ") || v.sku || v.id
+                    const active = selectedVariant === v.id
+                    const vp = getEffectivePrice(product, v)
+                    const isVOut = v.stock === 0
+                    return (
+                      <button key={v.id} onClick={() => !isVOut && setSelectedVariant(v.id)} disabled={isVOut} className={`rounded-xl border px-3 py-3 text-left ${active ? "bg-[#1a1a1a] text-white border-[#1a1a1a]" : isVOut ? "bg-[#f9f9f9] text-[#9a9a9a] border-[#F3E6D3]" : "bg-white border-[#F3E6D3] hover:bg-[#FFF1DA]"} `}>
+                        <div className="text-sm font-bold">{label}</div>
+                        <div className={`text-xs ${active ? "text-white/80" : "text-[#6b6b6b]"}`}>₦{vp.toLocaleString()} • {isVOut ? "Out" : `${v.stock} left`}{v.sku ? ` • ${v.sku}` : ""}</div>
+                      </button>
+                    )
+                  })}
+                </div>
+                {variant && <div className="mt-2 text-xs text-[#6b6b6b]">Selected {variantLabel} • SKU {variant.sku || "—"} • Stock {variant.stock}</div>}
+              </div>
+            )}
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <button onClick={handleAdd} disabled={product.stock === 0} className="inline-flex items-center gap-2 rounded-full bg-[#0B9C74] px-7 py-3.5 text-sm font-bold text-white hover:bg-[#0a8a66] disabled:opacity-50">
-                <ShoppingBag className="h-4 w-4" /> {added ? "Added" : product.stock === 0 ? "Out of stock" : "Add to cart"}
+              <button onClick={handleAdd} disabled={isOut} className="inline-flex items-center gap-2 rounded-full bg-[#0B9C74] px-7 py-3.5 text-sm font-bold text-white hover:bg-[#0a8a66] disabled:opacity-50">
+                <ShoppingBag className="h-4 w-4" /> {added ? "Added" : isOut ? "Out of stock" : "Add to cart"}
               </button>
               <a href={waLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-7 py-3.5 text-sm font-bold text-white hover:bg-black"><MessageCircle className="h-4 w-4" /> Order on WhatsApp</a>
               <button className="inline-flex items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-6 py-3.5 text-sm font-bold hover:bg-[#FFF1DA]"><Heart className="h-4 w-4" /> Wishlist</button>
@@ -134,7 +189,7 @@ export default function ProductDetail() {
 
             <div className="mt-4 flex flex-wrap gap-2">
               <button onClick={handleCopy} className="inline-flex items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-4 py-2 text-xs font-bold hover:bg-[#FFF1DA]"><Share2 className="h-3.5 w-3.5" /> {copied ? "Link copied" : "Share this product"}</button>
-              <a href={`https://wa.me/?text=${encodeURIComponent(`${product.name} — ₦${product.price.toLocaleString()} ${url}`)}`} target="_blank" rel="noreferrer" className="rounded-full bg-[#E6F7F1] border border-[#0B9C74]/20 px-4 py-2 text-xs font-bold text-[#0B9C74] hover:bg-[#0B9C74] hover:text-white">Share on WhatsApp</a>
+              <a href={`https://wa.me/?text=${encodeURIComponent(`${product.name}${variantLabel ? ` (${variantLabel})` : ""} — ₦${effectivePrice.toLocaleString()} ${url}`)}`} target="_blank" rel="noreferrer" className="rounded-full bg-[#E6F7F1] border border-[#0B9C74]/20 px-4 py-2 text-xs font-bold text-[#0B9C74] hover:bg-[#0B9C74] hover:text-white">Share on WhatsApp</a>
               <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(product.name)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer" className="rounded-full bg-white border border-[#F3E6D3] px-4 py-2 text-xs font-bold hover:bg-[#FFF1DA]">Share on X</a>
             </div>
 

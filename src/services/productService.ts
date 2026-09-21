@@ -1,5 +1,6 @@
 import api from "./api"
 import type { Product, CreateProductPayload, UpdateProductPayload } from "../types/product"
+import { getEffectivePrice, getTotalStock } from "../types/product"
 import { validateProductPayload, clampRequestSize, sanitize } from "../utils/validation"
 import { rateLimited } from "./rateLimitService"
 import { logger } from "./logger"
@@ -17,19 +18,31 @@ function getSellerId(): string {
 
 function getMockProducts(): Product[] {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
+    const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]") as Product[]
+    // migrate old without discount/variants
+    return arr.map((p) => ({
+      ...p,
+      discount: p.discount || undefined,
+      variants: p.variants || undefined,
+    }))
   } catch {
     return []
   }
 }
 
 function saveMockProducts(products: Product[]) {
-  // Simulate DB indexes: sellerId, isActive, category
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
 }
 
 function isMockMode(error: unknown) {
   return !error || (error as { response?: unknown })?.response === undefined
+}
+
+function normalizeStockForProduct(_p: CreateProductPayload | UpdateProductPayload, validated: { stock: number; variants?: Product["variants"] }): number {
+  if (validated.variants && validated.variants.length > 0) {
+    return validated.variants.reduce((s, v) => s + v.stock, 0)
+  }
+  return validated.stock
 }
 
 export const productService = {
@@ -43,7 +56,7 @@ export const productService = {
       let products = getMockProducts().filter((p) => p.sellerId === getSellerId())
       if (params?.search) {
         const q = sanitize(params.search, 100).toLowerCase()
-        products = products.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
+        products = products.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || (p.variants || []).some((v) => `${v.size} ${v.color} ${v.sku}`.toLowerCase().includes(q)))
       }
       if (params?.category) products = products.filter((p) => p.category === params.category)
       if (params?.isActive !== undefined) products = products.filter((p) => p.isActive === params.isActive)
@@ -85,7 +98,6 @@ export const productService = {
         products = products.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
       }
       if (params?.category) products = products.filter((p) => p.category === params.category)
-      // Public storefront: allow discovery across sellers, but log
       logger.debug("productService:listPublic", { count: products.length })
       return products
     }
@@ -93,12 +105,12 @@ export const productService = {
 
   async create(payload: CreateProductPayload): Promise<Product> {
     rateLimited(`products:create:${getSellerId()}`, 20, 60 * 1000)
-    const validated = validateProductPayload(payload as { name: string; description: string; price: number; stock: number; images: string[] })
-    clampRequestSize(JSON.stringify(payload), 800) // images base64 limit
-    // Image size check: each base64 approx 1.37x file size
+    const validated = validateProductPayload(payload as unknown as { name: string; description: string; price: number; stock: number; images: string[]; discount: unknown; variants: unknown })
+    clampRequestSize(JSON.stringify(payload), 800)
     for (const img of validated.images) {
       if (img.length > 500 * 1024) throw new Error("Image too large (500KB limit per image)")
     }
+    const normalizedStock = normalizeStockForProduct(payload, validated as unknown as { stock: number; variants: Product["variants"] })
     const idemKey = getIdempotencyKey({ name: validated.name, price: validated.price })
     const cached = getIdempotentResponse<Product>(idemKey)
     if (cached) {
@@ -106,7 +118,7 @@ export const productService = {
       return cached
     }
     try {
-      const { data } = await api.post<Product>("/products", payload, { headers: { "X-Idempotency-Key": idemKey } })
+      const { data } = await api.post<Product>("/products", { ...payload, stock: normalizedStock }, { headers: { "X-Idempotency-Key": idemKey } })
       logger.info("productService:create", { productId: data.id, sellerId: getSellerId() })
       return data
     } catch (error) {
@@ -119,10 +131,12 @@ export const productService = {
         description: validated.description,
         price: validated.price,
         currency: payload.currency || "NGN",
-        stock: validated.stock,
-        category: sanitize(payload.category, 40),
+        stock: normalizedStock,
+        category: sanitize(payload.category || "Other", 40),
         images: validated.images,
         isActive: payload.isActive,
+        discount: validated.discount,
+        variants: validated.variants,
         createdAt: now,
         updatedAt: now,
       }
@@ -140,6 +154,9 @@ export const productService = {
     if (payload.name) sanitize(payload.name, 80)
     if (payload.description) sanitize(payload.description, 2000)
     if (payload.price !== undefined && (payload.price < 100 || payload.price > 5000000)) throw new Error("Invalid price")
+    if (payload.discount !== undefined) {
+      // will validate in validateProductPayload after merge
+    }
     clampRequestSize(JSON.stringify(payload), 800)
     try {
       const { data } = await api.patch<Product>(`/products/${id}`, payload)
@@ -153,14 +170,33 @@ export const productService = {
         logger.warn("productService:update tenant isolation blocked", { id, sellerId: getSellerId() })
         throw new Error("Product not found")
       }
-      const updated: Product = { ...all[idx], ...payload, updatedAt: new Date().toISOString(), currency: payload.currency || all[idx].currency }
-      // Re-validate after merge
-      validateProductPayload({ name: updated.name, description: updated.description, price: updated.price, stock: updated.stock, images: updated.images })
+      // merge then validate
+      const merged = { ...all[idx], ...payload } as Product
+      const normalizedStock = merged.variants && merged.variants.length > 0 ? merged.variants.reduce((s, v) => s + v.stock, 0) : merged.stock
+      const validated = validateProductPayload({ name: merged.name, description: merged.description, price: merged.price, stock: normalizedStock, images: merged.images, discount: merged.discount, variants: merged.variants } as unknown as never)
+      const updated: Product = {
+        ...all[idx],
+        ...payload,
+        name: validated.name,
+        description: validated.description,
+        price: validated.price,
+        stock: normalizeStockForProduct({ ...all[idx], ...payload } as unknown as CreateProductPayload, validated as unknown as { stock: number; variants: Product["variants"] }),
+        images: validated.images,
+        discount: validated.discount,
+        variants: validated.variants,
+        currency: payload.currency || all[idx].currency,
+        updatedAt: new Date().toISOString(),
+      } as Product
+      // re-validate after merge done above; stock already normalized
       all[idx] = updated
       saveMockProducts(all)
       logger.info("productService:update mock", { id })
       return updated
     }
+  },
+
+  async toggleDiscount(id: string, discount: Product["discount"]): Promise<Product> {
+    return this.update(id, { discount } as UpdateProductPayload)
   },
 
   async remove(id: string): Promise<void> {
@@ -203,6 +239,7 @@ export const productService = {
         category: "Beauty",
         images: ["https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=600&fit=crop"],
         isActive: true,
+        discount: { active: true, type: "percentage", value: 15 },
         createdAt: now,
         updatedAt: now,
       },
@@ -210,13 +247,20 @@ export const productService = {
         id: "prod_demo2",
         sellerId,
         name: "Cozy Knit Hoodie",
-        description: "Soft fleece hoodie, unisex, perfect for harmattan.",
+        description: "Soft fleece hoodie, unisex, perfect for harmattan. Choose size and color.",
         price: 14000,
         currency: "NGN",
-        stock: 3,
+        stock: 9,
         category: "Fashion",
         images: ["https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=600&h=600&fit=crop"],
         isActive: true,
+        variants: [
+          { id: "var_s_m", size: "S", color: "Black", stock: 2, sku: "HOD-S-BLK" },
+          { id: "var_m_bl", size: "M", color: "Black", stock: 3, sku: "HOD-M-BLK" },
+          { id: "var_l_be", size: "L", color: "Beige", stock: 1, sku: "HOD-L-BEI" },
+          { id: "var_xl_gr", size: "XL", color: "Grey", stock: 3, sku: "HOD-XL-GRY" },
+        ],
+        discount: { active: false, type: "percentage", value: 10 },
         createdAt: now,
         updatedAt: now,
       },
@@ -241,3 +285,13 @@ export const productService = {
     logger.info("productService:seedDemo", { sellerId })
   },
 }
+
+export function getProductStock(p: Product, variantId?: string): number {
+  if (variantId && p.variants) {
+    const v = p.variants.find((x) => x.id === variantId)
+    if (v) return v.stock
+  }
+  return getTotalStock(p)
+}
+
+export { getEffectivePrice }

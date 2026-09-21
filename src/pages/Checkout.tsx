@@ -4,10 +4,14 @@ import { CreditCard, ShoppingBag } from "lucide-react"
 import { productService } from "../services/productService"
 import { orderService } from "../services/orderService"
 import { paymentService } from "../services/paymentService"
-import type { Product } from "../types/product"
+import { getEffectivePrice, getTotalStock } from "../types/product"
+import type { Product, ProductVariant } from "../types/product"
+
+type CartEntry = { productId: string; variantId?: string }
+type CartItem = { product: Product; variant: ProductVariant | null; effectivePrice: number }
 
 export default function Checkout() {
-  const [items, setItems] = useState<Product[]>([])
+  const [items, setItems] = useState<CartItem[]>([])
   const [customer, setCustomer] = useState({ name: "", phone: "", email: "", address: "" })
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -16,19 +20,27 @@ export default function Checkout() {
   useEffect(() => {
     productService.seedDemo()
     const raw = localStorage.getItem("cognicart_cart")
-    const ids: string[] = raw ? JSON.parse(raw) : []
+    let entries: CartEntry[] = []
+    try {
+      const parsed = raw ? JSON.parse(raw) : []
+      entries = parsed.map((e: unknown) => (typeof e === "string" ? { productId: e } : (e as CartEntry)))
+    } catch { entries = [] }
     const load = async () => {
-      const prods: Product[] = []
-      for (const id of ids) {
-        try { prods.push(await productService.getById(id)) } catch {}
+      const prods: CartItem[] = []
+      for (const ent of entries) {
+        try {
+          const p = await productService.getById(ent.productId)
+          const v = ent.variantId ? p.variants?.find((x) => x.id === ent.variantId) || null : null
+          prods.push({ product: p, variant: v, effectivePrice: getEffectivePrice(p, v) })
+        } catch {}
       }
       setItems(prods)
     }
     load()
   }, [])
 
-  const total = items.reduce((sum, p) => sum + p.price, 0)
-  const deliveryFee = total > 20000 ? 0 : 1500
+  const total = items.reduce((sum, it) => sum + it.effectivePrice, 0)
+  const deliveryFee = total > 20000 ? 0 : items.length ? 1500 : 0
   const grandTotal = total + deliveryFee
 
   const handlePay = async (e: React.FormEvent) => {
@@ -42,11 +54,18 @@ export default function Checkout() {
       setError("Cart empty")
       return
     }
+    for (const it of items) {
+      const stock = it.variant ? it.variant.stock : getTotalStock(it.product)
+      if (stock === 0) {
+        setError(`${it.product.name} is out of stock`)
+        return
+      }
+    }
     setPaying(true)
     try {
       const order = await orderService.create({
         customer: { name: customer.name, phone: customer.phone, address: customer.address },
-        items: items.map((p) => ({ productId: p.id, quantity: 1 })),
+        items: items.map((it) => ({ productId: it.product.id, quantity: 1, variantId: it.variant?.id })),
         deliveryAddress: customer.address,
         deliveryFee,
         paymentStatus: "Pending",
@@ -92,7 +111,7 @@ export default function Checkout() {
         <div className="text-center max-w-md">
           <div className="mx-auto h-12 w-12 rounded-full bg-[#FFF1DA] border border-[#F3E6D3] grid place-items-center"><ShoppingBag className="h-6 w-6 text-[#E85D26]" /></div>
           <h1 className="font-display text-2xl font-bold mt-3">No items to checkout</h1>
-          <p className="text-sm text-[#6b6b6b] mt-1">Add products from the store. Checkout creates a real order and pays via Paystack with platform fee split.</p>
+          <p className="text-sm text-[#6b6b6b] mt-1">Add products from the store selecting size/color. Checkout creates a real order and pays via Paystack with platform fee split.</p>
           <Link to="/store" className="mt-4 inline-flex rounded-full bg-[#0B9C74] px-6 py-3 text-sm font-bold text-white">Browse store</Link>
         </div>
       </div>
@@ -103,17 +122,20 @@ export default function Checkout() {
     <div className="min-h-screen bg-[#FFFBF5] py-10">
       <div className="mx-auto max-w-[640px] px-4 sm:px-6">
         <h1 className="font-display text-[34px] font-bold tracking-tight">Checkout with Paystack</h1>
-        <p className="text-sm text-[#6b6b6b]">Test Paystack flow. If VITE_PAYSTACK_PUBLIC_KEY is not set, a mock success is simulated. Real Paystack will open when key is configured.</p>
+        <p className="text-sm text-[#6b6b6b]">Discounted variant price verified at order time. If VITE_PAYSTACK_PUBLIC_KEY is not set, mock success is simulated.</p>
         {error && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-3 py-2.5 text-sm text-red-700">{error}</div>}
 
         <div className="mt-6 rounded-[22px] bg-white border border-[#F3E6D3] p-6">
           <div className="text-sm font-bold">{items.length} items • Total ₦{grandTotal.toLocaleString()}</div>
           <div className="mt-2 space-y-2">
-            {items.map((p) => (
-              <div key={p.id} className="flex justify-between text-sm border-b border-[#F3E6D3] py-2">
-                <span className="truncate">{p.name}</span><span className="font-bold">₦{p.price.toLocaleString()}</span>
-              </div>
-            ))}
+            {items.map((it, idx) => {
+              const label = it.variant ? [it.variant.size, it.variant.color].filter(Boolean).join(" / ") : ""
+              return (
+                <div key={idx} className="flex justify-between text-sm border-b border-[#F3E6D3] py-2">
+                  <span className="truncate">{it.product.name}{label ? ` (${label})` : ""}</span><span className="font-bold">₦{it.effectivePrice.toLocaleString()}</span>
+                </div>
+              )
+            })}
           </div>
           <div className="mt-3 flex justify-between text-sm"><span className="text-[#6b6b6b]">Subtotal</span><span>₦{total.toLocaleString()}</span></div>
           <div className="flex justify-between text-sm"><span className="text-[#6b6b6b]">Delivery</span><span>{deliveryFee === 0 ? "Free" : `₦${deliveryFee.toLocaleString()}`}</span></div>
@@ -127,7 +149,7 @@ export default function Checkout() {
             <button disabled={paying} className="w-full flex justify-center items-center gap-2 rounded-full bg-[#0B9C74] px-6 py-3 text-sm font-bold text-white hover:bg-[#0a8a66] disabled:opacity-60">
               <CreditCard className="h-4 w-4" /> {paying ? "Processing..." : `Pay ₦${grandTotal.toLocaleString()} now`}
             </button>
-            <p className="text-xs text-[#9a9a9a] leading-5">Creates order as Pending then verifies Paystack and marks Paid. Platform fee from admin Settings is split at verification. Seller sees it in Dashboard Revenue.</p>
+            <p className="text-xs text-[#9a9a9a] leading-5">Creates order as Pending then verifies Paystack and marks Paid with discounted total.</p>
           </form>
         </div>
 

@@ -4,6 +4,7 @@ import { Heart, ShoppingBag, Star, SlidersHorizontal, Store, MapPin } from "luci
 import { productService } from "../../services/productService"
 import { PRODUCT_CATEGORIES } from "../../types/product"
 import type { Product } from "../../types/product"
+import { getEffectivePrice, getDisplayPrice } from "../../types/product"
 import { useSEO } from "../../hooks/useSEO"
 
 type SellerCard = { id: string; businessName: string; location?: string; productsCount: number }
@@ -136,8 +137,11 @@ export default function Storefront() {
                 <div className="aspect-square bg-[#FFFBF5] p-4 flex items-center justify-center"><img src={p.images[0]} alt={p.name} className="h-full w-full object-contain mix-blend-multiply group-hover:scale-[1.02] transition" /></div>
                 <div className="p-3.5">
                   <div className="text-[13px] font-bold leading-tight line-clamp-1">{p.name}</div>
-                  <div className="mt-1 text-xs text-[#6b6b6b] line-clamp-1">{p.category} • {p.description.slice(0, 44)}</div>
-                  <div className="mt-2 flex items-center justify-between"><span className="text-sm font-bold">₦{p.price.toLocaleString()}</span><span className="h-8 w-8 rounded-full bg-[#1a1a1a] text-white grid place-items-center"><ShoppingBag className="h-4 w-4" /></span></div>
+                  <div className="mt-1 text-xs text-[#6b6b6b] line-clamp-1">{p.category} • {p.description.slice(0, 44)}{p.variants?.length ? ` • ${p.variants.length} variants` : ""}</div>
+                  <div className="mt-2 flex items-center justify-between">
+                    {(() => { const d = getDisplayPrice(p); const ep = getEffectivePrice(p); return d.hasDiscount ? <span className="flex items-center gap-1"><span className="text-sm font-bold text-[#E85D26]">₦{ep.toLocaleString()}</span><span className="text-xs line-through text-[#9a9a9a]">₦{d.original.toLocaleString()}</span></span> : <span className="text-sm font-bold">₦{ep.toLocaleString()}</span> })()}
+                    <span className="h-8 w-8 rounded-full bg-[#1a1a1a] text-white grid place-items-center"><ShoppingBag className="h-4 w-4" /></span>
+                  </div>
                   <div className="mt-2 text-xs text-[#0B9C74] font-bold">View • SEO product page →</div>
                 </div>
               </Link>
