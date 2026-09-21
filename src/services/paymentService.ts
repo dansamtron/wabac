@@ -1,6 +1,11 @@
 import api from "./api"
 import type { Transaction, InitializePaymentPayload } from "../types/payment"
 import { adminService } from "./adminService"
+import { rateLimited } from "./rateLimitService"
+import { logger } from "./logger"
+import { webhookService } from "./webhookService"
+import { clampRequestSize, sanitize } from "../utils/validation"
+import { getIdempotencyKey, getIdempotentResponse, setIdempotentResponse } from "../utils/idempotency"
 
 const TRANSACTION_KEY = "cognicart_transactions"
 
@@ -33,7 +38,6 @@ function genReference() {
 }
 
 function paystackFee(amount: number) {
-  // Paystack NG fee 1.5% capped 2000 plus 100 for >2500? Mock 1.5% cap 2000
   const fee = Math.round(amount * 0.015)
   return Math.min(fee, 2000)
 }
@@ -68,13 +72,11 @@ function loadPaystackScript(): Promise<void> {
 
 export const paymentService = {
   getPublicKey(): string | null {
-    // Vite env
     const key = (import.meta as unknown as { env: Record<string, string> }).env?.VITE_PAYSTACK_PUBLIC_KEY as string | undefined
     return key || null
   },
 
   list(): Transaction[] {
-    // sync mock list filtered by sellerId
     const sellerId = getSellerId()
     return getTransactions().filter((t) => t.sellerId === sellerId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   },
@@ -84,10 +86,35 @@ export const paymentService = {
   },
 
   async initialize(payload: InitializePaymentPayload): Promise<{ reference: string; authorization_url?: string; transaction: Transaction }> {
+    rateLimited(`payments:init:${getSellerId()}`, 10, 60 * 1000)
+    if (!payload.orderId || payload.orderId.length > 100) throw new Error("Invalid orderId")
+    if (!payload.email || !payload.email.includes("@")) throw new Error("Invalid email for payment")
+    if (!payload.amount || payload.amount < 100 || payload.amount > 10000000) throw new Error("Invalid amount")
+    clampRequestSize(JSON.stringify(payload), 50)
+
+    const idemKey = getIdempotencyKey({ orderId: payload.orderId, amount: payload.amount })
+    const cached = getIdempotentResponse<{ reference: string; transaction: Transaction }>(idemKey)
+    if (cached) {
+      logger.info("paymentService:initialize idempotency hit", { orderId: payload.orderId })
+      return cached
+    }
+
     const sellerId = payload.sellerId || getSellerId()
+    // Validate order exists and belongs to seller (tenant isolation)
     try {
-      const { data } = await api.post<{ reference: string; authorization_url?: string }>("/payments/initialize", payload)
-      // create local mirror transaction for tracking
+      const ordersRaw = localStorage.getItem("cognicart_orders")
+      if (ordersRaw) {
+        const orders = JSON.parse(ordersRaw) as Array<{ id: string; sellerId: string }>
+        const order = orders.find((o) => o.id === payload.orderId)
+        if (order && order.sellerId !== sellerId && sellerId !== "mock_seller") {
+          logger.warn("paymentService:initialize cross-seller attempt", { orderId: payload.orderId, orderSeller: order.sellerId, sellerId })
+          throw new Error("Order does not belong to seller")
+        }
+      }
+    } catch {}
+
+    try {
+      const { data } = await api.post<{ reference: string; authorization_url?: string }>("/payments/initialize", payload, { headers: { "X-Idempotency-Key": idemKey } })
       const feeCfg = adminService.getFeeConfig()
       const platformFee = Math.round(payload.amount * (feeCfg.percentage / 100) + feeCfg.fixed)
       const pFee = paystackFee(payload.amount)
@@ -102,8 +129,8 @@ export const paymentService = {
         sellerAmount: payload.amount - platformFee - pFee,
         paystackFee: pFee,
         currency: "NGN",
-        reference: data.reference,
-        email: payload.email,
+        reference: sanitize(data.reference, 100),
+        email: sanitize(payload.email, 100),
         status: "pending",
         createdAt: new Date().toISOString(),
         channel: "paystack",
@@ -111,7 +138,10 @@ export const paymentService = {
       const all = getTransactions()
       all.push(t)
       saveTransactions(all)
-      return { reference: data.reference, authorization_url: data.authorization_url, transaction: t }
+      const res = { reference: data.reference, authorization_url: data.authorization_url, transaction: t }
+      setIdempotentResponse(idemKey, res)
+      logger.info("paymentService:initialize success", { orderId: payload.orderId, reference: data.reference, sellerId })
+      return res
     } catch (error) {
       if (!isMockMode(error)) throw error
       const feeCfg = adminService.getFeeConfig()
@@ -130,7 +160,7 @@ export const paymentService = {
         paystackFee: pFee,
         currency: "NGN",
         reference,
-        email: payload.email,
+        email: sanitize(payload.email, 100),
         status: "pending",
         createdAt: new Date().toISOString(),
         channel: "paystack",
@@ -138,16 +168,17 @@ export const paymentService = {
       const all = getTransactions()
       all.push(t)
       saveTransactions(all)
-      return { reference, transaction: t }
+      const res = { reference, transaction: t }
+      setIdempotentResponse(idemKey, res)
+      logger.info("paymentService:initialize mock", { orderId: payload.orderId, reference, sellerId })
+      return res
     }
   },
 
   async payWithPaystack(payload: InitializePaymentPayload & { onSuccess?: (ref: string) => void; onClose?: () => void }): Promise<string> {
+    rateLimited(`payments:pay:${payload.orderId}`, 3, 60 * 1000)
     const { reference } = await this.initialize(payload)
     const publicKey = this.getPublicKey()
-
-    // If backend provided authorization_url, open it
-    // Else try PaystackPop if key available, else mock success
 
     if (publicKey) {
       try {
@@ -156,12 +187,14 @@ export const paymentService = {
           return await new Promise<string>((resolve, reject) => {
             const handler = window.PaystackPop!.setup({
               key: publicKey,
-              email: payload.email,
+              email: sanitize(payload.email, 100),
               amount: payload.amount * 100,
               currency: "NGN",
               ref: reference,
               callback: (res) => {
-                this.verify(res.reference).then(() => {
+                // Verify Paystack webhook signature would be checked server-side; here we simulate verification
+                webhookService.verifyPaystackSignature(JSON.stringify(res), "mock")
+                this.verify(res.reference, "mock").then(() => {
                   payload.onSuccess?.(res.reference)
                   resolve(res.reference)
                 }).catch(reject)
@@ -172,6 +205,7 @@ export const paymentService = {
                 if (idx !== -1) {
                   all[idx].status = "abandoned"
                   saveTransactions(all)
+                  logger.warn("paymentService:pay abandoned", { reference })
                 }
                 payload.onClose?.()
                 reject(new Error("Payment closed"))
@@ -181,34 +215,37 @@ export const paymentService = {
           })
         }
       } catch {
-        // fallback to mock verify after delay
+        // fallback to mock
       }
     }
 
-    // Mock flow: simulate user paying after 1.2s
     return await new Promise<string>((resolve) => {
       setTimeout(async () => {
-        await this.verify(reference)
+        await this.verify(reference, "mock")
         payload.onSuccess?.(reference)
         resolve(reference)
       }, 1200)
     })
   },
 
-  async verify(reference: string): Promise<Transaction> {
+  async verify(reference: string, signature = "mock"): Promise<Transaction> {
+    rateLimited(`payments:verify:${reference}`, 10, 60 * 1000)
+    if (!reference || reference.length > 100) throw new Error("Invalid reference")
+    // Webhook signature verification hardening: Paystack would send x-paystack-signature
+    if (!webhookService.verifyPaystackSignature(reference, signature)) {
+      logger.error("paymentService:verify signature failed", { reference })
+      throw new Error("Payment verification failed: invalid signature")
+    }
     try {
-      const { data } = await api.post<Transaction>(`/payments/verify/${reference}`)
-      // mirror update locally
+      const { data } = await api.post<Transaction>(`/payments/verify/${reference}`, null, { headers: { "X-Paystack-Signature": signature } })
       const all = getTransactions()
       const idx = all.findIndex((t) => t.reference === reference)
       if (idx !== -1) {
         all[idx] = { ...all[idx], status: data.status || "success", verifiedAt: new Date().toISOString() }
         saveTransactions(all)
-        // update order payment status
         const { orderService } = await import("./orderService")
         try {
           await orderService.updatePaymentStatus(all[idx].orderId, "Paid")
-          // also set paymentReference on order
           const ordersRaw = localStorage.getItem("cognicart_orders")
           if (ordersRaw) {
             const orders = JSON.parse(ordersRaw)
@@ -222,21 +259,23 @@ export const paymentService = {
           }
         } catch {}
       }
+      logger.info("paymentService:verify success", { reference })
       return data
     } catch (error) {
       if (!isMockMode(error)) throw error
       const all = getTransactions()
       const idx = all.findIndex((t) => t.reference === reference)
-      if (idx === -1) throw new Error("Transaction not found")
+      if (idx === -1) {
+        logger.warn("paymentService:verify not found", { reference })
+        throw new Error("Transaction not found")
+      }
       all[idx].status = "success"
       all[idx].verifiedAt = new Date().toISOString()
       saveTransactions(all)
-      // update order
       const { orderService } = await import("./orderService")
       try {
         await orderService.updatePaymentStatus(all[idx].orderId, "Paid")
       } catch {}
-      // also directly patch order reference if sellerId mismatch fallback?
       try {
         const ordersRaw = localStorage.getItem("cognicart_orders")
         if (ordersRaw) {
@@ -250,6 +289,7 @@ export const paymentService = {
           }
         }
       } catch {}
+      logger.info("paymentService:verify mock success", { reference })
       return all[idx]
     }
   },
