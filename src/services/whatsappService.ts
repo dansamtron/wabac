@@ -265,7 +265,7 @@ export const whatsappService = {
     }
   },
 
-  async handleIncoming(payload: { from: string; body: string; businessPhone?: string }): Promise<{ inbound: WhatsAppMessage; outbound: WhatsAppMessage }> {
+  async handleIncoming(payload: { from: string; body: string; businessPhone?: string }): Promise<{ inbound: WhatsAppMessage; outbound: WhatsAppMessage; toolCalls?: unknown }> {
     try {
       const { data } = await api.post<{ inbound: WhatsAppMessage; outbound: WhatsAppMessage }>("/whatsapp/incoming", payload)
       return data
@@ -300,7 +300,33 @@ export const whatsappService = {
         deterministic: false,
       }
 
-      const replyBody = deterministicReply(targetSellerId, payload.body)
+      let replyBody: string
+      let toolCalls: unknown = null
+      let isDeterministic = true
+      try {
+        const { aiService } = await import("./aiService")
+        if (aiService.isEnabled(targetSellerId)) {
+          const aiRes = await aiService.chat(targetSellerId, payload.from, payload.body)
+          replyBody = aiRes.reply
+          toolCalls = aiRes.toolCalls
+          isDeterministic = false
+          // store tool log for UI
+          try {
+            const key = `cognicart_ai_logs_${targetSellerId}_${payload.from}`
+            const existing = JSON.parse(localStorage.getItem(key) || "[]")
+            const outboundId = "wmsg_out_" + (Date.now() + 1).toString(36) + Math.random().toString(36).slice(2, 6)
+            // we will create outbound after to have id, so store later
+            localStorage.setItem(`${key}_pending`, JSON.stringify({ toolCalls, intent: aiRes.intent, orderId: aiRes.orderId }))
+            // keep for later retrieval
+            void existing
+            void outboundId
+          } catch {}
+        } else {
+          replyBody = deterministicReply(targetSellerId, payload.body)
+        }
+      } catch {
+        replyBody = deterministicReply(targetSellerId, payload.body)
+      }
 
       const outbound: WhatsAppMessage = {
         id: "wmsg_out_" + (Date.now() + 1).toString(36) + Math.random().toString(36).slice(2, 6),
@@ -311,13 +337,21 @@ export const whatsappService = {
         body: replyBody,
         timestamp: new Date(Date.now() + 800).toISOString(),
         status: "sent",
-        deterministic: true,
+        deterministic: isDeterministic,
+      }
+
+      // persist toolCalls for this outbound if AI
+      if (toolCalls) {
+        try {
+          const logKey = `cognicart_ai_tool_${outbound.id}`
+          localStorage.setItem(logKey, JSON.stringify(toolCalls))
+        } catch {}
       }
 
       const all = getMessages()
       all.push(inbound, outbound)
       saveMessages(all)
-      return { inbound, outbound }
+      return { inbound, outbound, toolCalls }
     }
   },
 
