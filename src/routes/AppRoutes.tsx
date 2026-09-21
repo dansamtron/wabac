@@ -11,8 +11,19 @@ import Customers from "../pages/customers/Customers"
 import Settings from "../pages/dashboard/Settings"
 import WhatsAppPage from "../pages/whatsapp/WhatsApp"
 import Storefront from "../pages/storefront/Storefront"
+import ProductDetail from "../pages/storefront/ProductDetail"
 import { DashboardLayout } from "../layouts/DashboardLayout"
 import { ProtectedRoute } from "./ProtectedRoute"
+import About from "../pages/public/About"
+import Contact from "../pages/public/Contact"
+import Careers from "../pages/public/Careers"
+import Privacy from "../pages/public/Privacy"
+import Terms from "../pages/public/Terms"
+import WhatsAppApi from "../pages/public/WhatsAppApi"
+import Demo from "../pages/public/Demo"
+import Search from "../pages/Search"
+import Cart from "../pages/Cart"
+import Checkout from "../pages/Checkout"
 
 function NotFound() {
   return (
@@ -32,7 +43,21 @@ export function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
       <Route path="/store" element={<Storefront />} />
+      <Route path="/store/:id" element={<ProductDetail />} />
+      <Route path="/marketplace" element={<Storefront />} />
+
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/careers" element={<Careers />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/whatsapp-api" element={<WhatsAppApi />} />
+      <Route path="/demo" element={<Demo />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
 
       <Route
         element={

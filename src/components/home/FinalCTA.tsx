@@ -1,4 +1,5 @@
 import { ArrowRight, Check } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export function FinalCTA() {
   return (
@@ -18,12 +19,12 @@ export function FinalCTA() {
             </div>
           </div>
           <div className="flex w-full lg:w-auto flex-col sm:flex-row gap-3">
-            <a href="#" className="inline-flex justify-center items-center gap-2 rounded-full bg-[#0B9C74] px-8 py-4 text-sm font-bold text-white shadow-lg hover:bg-[#0a8a66] transition">
+            <Link to="/register" className="inline-flex justify-center items-center gap-2 rounded-full bg-[#0B9C74] px-8 py-4 text-sm font-bold text-white shadow-lg hover:bg-[#0a8a66] transition">
               Start selling free <ArrowRight className="h-4 w-4" />
-            </a>
-            <a href="#" className="inline-flex justify-center items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-8 py-4 text-sm font-bold hover:bg-[#FFF1DA] transition">
+            </Link>
+            <Link to="/contact" className="inline-flex justify-center items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-8 py-4 text-sm font-bold hover:bg-[#FFF1DA] transition">
               Talk to founder
-            </a>
+            </Link>
           </div>
         </div>
       </div>

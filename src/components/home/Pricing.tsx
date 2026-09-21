@@ -1,4 +1,5 @@
 import { Check } from "lucide-react"
+import { Link } from "react-router-dom"
 
 type Tier = {
   name: string
@@ -7,6 +8,7 @@ type Tier = {
   features: string[]
   cta: string
   featured: boolean
+  to: string
 }
 
 const tiers: Tier[] = [
@@ -17,6 +19,7 @@ const tiers: Tier[] = [
     features: ["50 AI conversations / mo", "20 products", "Basic dashboard", "Community support"],
     cta: "Start free",
     featured: false,
+    to: "/register",
   },
   {
     name: "Growth",
@@ -25,6 +28,7 @@ const tiers: Tier[] = [
     features: ["Unlimited AI chats", "1,000 products", "Broadcasts and coupons", "Paystack and Flutterwave", "Priority support"],
     cta: "Start 14-day trial",
     featured: true,
+    to: "/register",
   },
   {
     name: "Scale",
@@ -33,6 +37,7 @@ const tiers: Tier[] = [
     features: ["Multi-seller and branches", "API and webhooks", "Dedicated success manager", "SLA and invoicing"],
     cta: "Contact sales",
     featured: false,
+    to: "/contact",
   },
 ]
 
@@ -64,12 +69,13 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-              <button className={`mt-6 w-full rounded-full py-3 text-sm font-bold transition ${tier.featured ? "bg-[#0B9C74] text-white hover:bg-[#0a8a66]" : "bg-white border border-[#F3E6D3] hover:bg-[#FFF1DA] text-[#1a1a1a]"}`}>
+              <Link to={tier.to} className={`mt-6 w-full rounded-full py-3 text-sm font-bold transition text-center ${tier.featured ? "bg-[#0B9C74] text-white hover:bg-[#0a8a66]" : "bg-white border border-[#F3E6D3] hover:bg-[#FFF1DA] text-[#1a1a1a]"}`}>
                 {tier.cta}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
+        <div className="mt-6 text-center text-xs text-[#6b6b6b]">Questions? <Link to="/contact" className="font-bold text-[#0B9C74] underline">Talk to founder</Link> or <Link to="/privacy" className="font-bold underline">see privacy and terms</Link></div>
       </div>
     </section>
   )
