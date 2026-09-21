@@ -14,7 +14,6 @@ import {
   Sparkles,
   Check,
   Play,
-  Quote,
   Share2,
   Mail,
   Globe,
@@ -30,13 +29,12 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-[#FFFBF5]/90 backdrop-blur-md border-b border-[#F3E6D3]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
           <div className="flex h-[72px] items-center justify-between gap-6">
-            {/* Logo */}
             <div className="flex items-center gap-8">
               <a href="#" className="flex items-center gap-2.5">
                 <span className="h-9 w-9 rounded-xl bg-[#0B9C74] flex items-center justify-center text-white shadow-sm">
                   <MessageCircle className="h-5 w-5 fill-white/20" />
                 </span>
-                <span className="font-display text-[22px] font-black tracking-tight leading-none">wabac</span>
+                <span className="font-display text-[22px] font-bold tracking-tight leading-none">Cognicart</span>
                 <span className="hidden sm:block text-[11px] font-bold tracking-widest text-[#0B9C74] border border-[#0B9C74]/20 bg-[#E6F7F1] px-1.5 py-0.5 rounded">WHATSAPP AI</span>
               </a>
               <nav className="hidden lg:flex items-center gap-1 text-[14px] font-medium text-[#2b2b2b]">
@@ -61,7 +59,6 @@ export default function App() {
               </a>
             </div>
 
-            {/* Mobile */}
             <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden h-10 w-10 grid place-items-center rounded-full bg-white border border-[#F3E6D3]">
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -82,7 +79,6 @@ export default function App() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        {/* Background blobs mimicking Option B */}
         <div className="absolute inset-0 -z-10 bg-[#FFFBF5]" />
         <div className="absolute -z-10 top-0 left-0 w-[78%] lg:w-[62%] h-[86%] bg-[#FDEDD3] rounded-br-[90px] lg:rounded-br-[140px]" />
         <div className="absolute -z-10 top-0 right-0 w-[45%] h-[62%] bg-[#F6C68B]/70 hidden lg:block" style={{ clipPath: "ellipse(80% 90% at 80% 0%)" }} />
@@ -92,18 +88,16 @@ export default function App() {
           <span className="h-2 w-2 rounded-full bg-white/80" />
           <span className="h-2 w-2 rounded-full bg-white/50" />
         </div>
-        {/* tiny plant decorations */}
         <div className="pointer-events-none absolute -z-10 left-[52%] top-[18%] hidden lg:block text-2xl">🪴</div>
         <div className="pointer-events-none absolute -z-10 right-[14%] top-[38%] hidden lg:block text-lg">🍋</div>
 
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-10 items-center py-8 lg:py-12">
-            {/* Left copy */}
+          <div className="grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-10 items-center py-8 lg:py-14">
             <div className="pt-2 lg:pt-8">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-3 py-1 text-xs font-semibold shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-3 py-1 text-xs font-medium shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-[#0B9C74] animate-pulse" /> Trusted by 5,000+ sellers on WhatsApp
               </div>
-              <h1 className="font-display font-black tracking-tight leading-[0.9] text-[38px] sm:text-[54px] lg:text-[62px] mt-5">
+              <h1 className="font-display font-bold tracking-tight leading-[0.9] text-[38px] sm:text-[54px] lg:text-[62px] mt-5">
                 WhatsApp
                 <br />
                 <span className="relative inline-block">
@@ -127,24 +121,10 @@ export default function App() {
                   <Play className="h-4 w-4 fill-white" /> Watch 30s demo
                 </a>
               </div>
-
-              <div className="mt-6 flex items-center gap-4">
-                <div className="flex -space-x-2">
-                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" alt="" className="h-8 w-8 rounded-full border-2 border-white object-cover" />
-                  <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=80&h=80&fit=crop" alt="" className="h-8 w-8 rounded-full border-2 border-white object-cover" />
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" alt="" className="h-8 w-8 rounded-full border-2 border-white object-cover" />
-                </div>
-                <div className="text-xs">
-                  <div className="flex items-center gap-1 font-bold"><Star className="h-3.5 w-3.5 fill-[#E85D26] text-[#E85D26]" /> 4.9/5 from 1,200 sellers</div>
-                  <div className="text-[#6b6b6b]">Loved by fashion, beauty & food stores</div>
-                </div>
-              </div>
             </div>
 
-            {/* Right collage — recreates Option B's 2x2 */}
             <div className="relative lg:h-[520px] flex items-center">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
-                {/* Top left — Product */}
                 <div className="relative rounded-[22px] bg-white p-3 sm:p-4 shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-[#F3E6D3] flex flex-col">
                   <div className="absolute -top-2 -right-2 bg-[#0B9C74] text-white text-[10px] font-bold px-2 py-1 rounded-full rotate-3 shadow">BESTSELLER</div>
                   <div className="flex-1 rounded-xl bg-[#FFF6E8] p-3 flex items-center justify-center">
@@ -154,15 +134,13 @@ export default function App() {
                     <div className="text-xs font-bold leading-tight">Elixir Glow Serum</div>
                     <div className="text-[11px] text-[#6b6b6b]">30ml • Vitamin C</div>
                     <div className="mt-2 flex items-center justify-between">
-                      <span className="text-sm font-black">$28.00</span>
+                      <span className="text-sm font-bold">$28.00</span>
                       <span className="h-7 w-7 grid place-items-center rounded-full bg-[#0B9C74] text-white"><ShoppingBag className="h-3.5 w-3.5" /></span>
                     </div>
                   </div>
-                  {/* doodle arrow */}
                   <span className="pointer-events-none absolute -right-6 top-10 hidden lg:block text-[#E85D26] text-xl rotate-12">🖍️</span>
                 </div>
 
-                {/* Top right — Chat on laptop */}
                 <div className="relative rounded-[22px] overflow-hidden bg-[#FFF1DA] border border-[#F3E6D3] shadow-[0_20px_40px_rgba(0,0,0,0.08)] p-0 flex flex-col">
                   <div className="relative flex-1 bg-white m-2 rounded-2xl overflow-hidden border border-[#F3E6D3]">
                     <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&h=400&fit=crop" alt="laptop" className="h-28 sm:h-32 w-full object-cover opacity-90" />
@@ -170,7 +148,7 @@ export default function App() {
                     <div className="absolute bottom-2 left-2 right-2">
                       <div className="rounded-2xl bg-white p-2.5 shadow-lg max-w-[85%]">
                         <div className="text-[11px] font-bold leading-tight">Is it in stock? And a SPF one? Need advice for oily skin 🙏</div>
-                        <div className="mt-2 rounded-xl bg-[#E6F7F1] p-2 text-[11px] leading-snug"><span className="font-bold text-[#0B9C74]">wabac AI •</span> Yes! For oily skin try Elixir + Matte Sunscreen — bundle ₹499, free delivery? Want me to add to cart?</div>
+                        <div className="mt-2 rounded-xl bg-[#E6F7F1] p-2 text-[11px] leading-snug"><span className="font-bold text-[#0B9C74]">Cognicart AI •</span> Yes! For oily skin try Elixir + Matte Sunscreen — bundle ₹499, free delivery? Want me to add to cart?</div>
                       </div>
                     </div>
                     <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow">
@@ -182,7 +160,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Bottom left — Sellers 1 */}
                 <div className="relative rounded-[22px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-[#F3E6D3] h-[168px] sm:h-[190px]">
                   <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=600&fit=crop" alt="two sellers smiling" className="h-full w-full object-cover" />
                   <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur rounded-full px-3 py-1.5 text-xs font-bold shadow flex items-center gap-2">
@@ -190,7 +167,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Bottom right — Sellers 2 */}
                 <div className="relative rounded-[22px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-[#F3E6D3] h-[168px] sm:h-[190px]">
                   <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=600&fit=crop" alt="two sellers" className="h-full w-full object-cover" />
                   <div className="absolute top-2 left-2 bg-[#0B9C74] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">⭐ 2,341 orders via WhatsApp</div>
@@ -205,7 +181,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* Features — 4 columns like mock "Featured Foytur" */}
+      {/* Features */}
       <section id="features" className="bg-white border-y border-[#F3E6D3]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
@@ -243,27 +219,12 @@ export default function App() {
         </div>
       </section>
 
-      {/* Social proof strip */}
-      <section className="bg-[#FFFBF5] border-b border-[#F3E6D3]">
-        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-center lg:justify-between gap-4 text-xs font-bold tracking-widest text-[#9a9a9a]">
-          <span className="hidden lg:block">TRUSTED BY SELLERS AT</span>
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 opacity-70">
-            <span className="font-display text-[18px] tracking-tight text-[#1a1a1a]">Paystack</span>
-            <span className="font-display text-[18px] tracking-tight text-[#1a1a1a]">flutterwave</span>
-            <span className="font-display text-[17px] tracking-tight text-[#1a1a1a]">Shopify</span>
-            <span className="font-display text-[17px] tracking-tight text-[#1a1a1a]">stripe</span>
-            <span className="font-display text-[15px] tracking-tight text-[#1a1a1a]">HubSpot</span>
-          </div>
-          <span className="hidden lg:inline-flex items-center gap-2 font-medium normal-case tracking-normal text-[#0B9C74]"><Check className="h-4 w-4" /> 99.9% uptime</span>
-        </div>
-      </section>
-
       {/* Marketplace */}
       <section id="marketplace" className="bg-[#FFFBF5]">
-        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div>
-              <h2 className="font-display text-[34px] sm:text-[42px] font-black tracking-tight leading-none">Marketplace</h2>
+              <h2 className="font-display text-[34px] sm:text-[42px] font-bold tracking-tight leading-none">Marketplace</h2>
               <p className="mt-2 text-sm text-[#6b6b6b]">Fresh drops from sellers you follow — chat to buy in one message.</p>
             </div>
             <div className="flex items-center gap-2">
@@ -328,11 +289,11 @@ export default function App() {
                   <div className="text-[13px] font-bold leading-tight line-clamp-1">{p.name}</div>
                   <div className="mt-1 flex items-center gap-1 text-xs">
                     <Star className="h-3 w-3 fill-[#E85D26] text-[#E85D26]" />
-                    <span className="font-semibold">{p.rating}</span>
+                    <span className="font-medium">{p.rating}</span>
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <div>
-                      <span className="text-sm font-black">{p.price}</span>
+                      <span className="text-sm font-bold">{p.price}</span>
                       {p.old && <span className="ml-1 text-xs line-through text-[#9a9a9a]">{p.old}</span>}
                     </div>
                     <button className="h-8 w-8 rounded-full bg-[#1a1a1a] text-white grid place-items-center hover:bg-black transition">
@@ -350,8 +311,8 @@ export default function App() {
       <section id="sellers" className="bg-white border-y border-[#F3E6D3]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#E6F7F1] border border-[#0B9C74]/10 px-3 py-1 text-xs font-bold text-[#0B9C74]"><Sparkles className="h-3.5 w-3.5" /> How wabac works</span>
-            <h2 className="font-display text-[32px] lg:text-[40px] font-black tracking-tight leading-none mt-4">From chat to checkout in 3 taps</h2>
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#E6F7F1] border border-[#0B9C74]/10 px-3 py-1 text-xs font-bold text-[#0B9C74]"><Sparkles className="h-3.5 w-3.5" /> How Cognicart works</span>
+            <h2 className="font-display text-[32px] lg:text-[40px] font-bold tracking-tight leading-none mt-4">From chat to checkout in 3 taps</h2>
             <p className="mt-3 text-sm leading-6 text-[#5a5a5a]">No website needed. Your AI shop lives in WhatsApp — where your customers already are.</p>
           </div>
 
@@ -382,7 +343,7 @@ export default function App() {
               <div key={s.step} className="rounded-[22px] bg-[#FFFBF5] border border-[#F3E6D3] overflow-hidden hover:shadow-[0_16px_30px_rgba(0,0,0,0.06)] transition group">
                 <div className="h-44 overflow-hidden relative">
                   <img src={s.img} alt="" className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-700" />
-                  <span className="absolute left-3 top-3 rounded-full bg-white border border-[#F3E6D3] px-3 py-1 text-xs font-black">{s.step}</span>
+                  <span className="absolute left-3 top-3 rounded-full bg-white border border-[#F3E6D3] px-3 py-1 text-xs font-bold">{s.step}</span>
                   <span className="absolute right-3 bottom-3 h-10 w-10 rounded-xl bg-white border border-[#F3E6D3] grid place-items-center shadow-sm">
                     <s.icon className="h-5 w-5 text-[#0B9C74]" />
                   </span>
@@ -397,62 +358,11 @@ export default function App() {
         </div>
       </section>
 
-      {/* Testimonial + WhatsApp proof */}
-      <section className="bg-[#FFF1DA] border-b border-[#F3E6D3]">
-        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
-            <div className="rounded-[24px] bg-white border border-[#F3E6D3] p-6 sm:p-8 shadow-sm">
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="h-4 w-4 fill-[#E85D26] text-[#E85D26]" />
-                ))}
-              </div>
-              <div className="relative mt-4">
-                <Quote className="absolute -top-2 -left-2 h-8 w-8 text-[#F3E6D3]" />
-                <p className="relative font-display text-[20px] sm:text-[22px] font-bold leading-tight">
-                  “I used to stay up replying DMs. Now wabac replies in my voice, upsells bundles, and I wake up to paid orders.”
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-3">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="" className="h-10 w-10 rounded-full object-cover" />
-                <div>
-                  <div className="text-sm font-bold">Ngozi A. — Glow by N</div>
-                  <div className="text-xs text-[#6b6b6b]">Beauty seller • 1,842 orders via WhatsApp</div>
-                </div>
-                <span className="ml-auto hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#E6F7F1] px-3 py-1 text-xs font-bold text-[#0B9C74]"><span className="h-2 w-2 rounded-full bg-[#0B9C74] animate-pulse" /> Live on WhatsApp</span>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="rounded-[24px] bg-[#0B2E1F] p-6 text-white overflow-hidden relative">
-                <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-[#0B9C74]/30 blur-2xl" />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold flex items-center gap-2"><MessageCircle className="h-4 w-4" /> WhatsApp</span>
-                  <span className="text-xs bg-white/10 px-2 py-1 rounded-full">Today 9:41</span>
-                </div>
-                <div className="mt-6 space-y-3 max-w-[92%]">
-                  <div className="rounded-2xl rounded-bl-sm bg-white text-[#1a1a1a] p-3 text-sm">Hi! I need the Elixir serum — is the SPF one available? 👀</div>
-                  <div className="rounded-2xl rounded-br-sm bg-[#0B9C74] p-3 text-sm ml-auto">Yes! Bundle both for ₦12,500 — free delivery today. Want me to reserve?</div>
-                  <div className="rounded-2xl rounded-bl-sm bg-white text-[#1a1a1a] p-3 text-sm">Add both please. Pay on delivery?</div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-bold text-[#1a1a1a]">Pay on delivery confirmed ✅ <span className="rounded-full bg-[#0B9C74] px-2 py-1 text-white">Order #2841</span></div>
-                </div>
-                <div className="mt-6 flex items-center gap-2 text-xs text-white/70">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" /> AI replies in ~3s • Speaks English, Pidgin & Yoruba
-                </div>
-              </div>
-              <div className="mt-4 flex justify-center gap-2 text-xs font-bold text-[#6b6b6b]">
-                <span className="hidden sm:inline">No app to download •</span> Works with your existing WhatsApp Business
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
       <section id="pricing" className="bg-white">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-[34px] lg:text-[40px] font-black tracking-tight leading-none">Simple, fair pricing</h2>
+            <h2 className="font-display text-[34px] lg:text-[40px] font-bold tracking-tight leading-none">Simple, fair pricing</h2>
             <p className="mt-3 text-sm text-[#5a5a5a]">Start free. Grow with you — only pay when you sell. Cancel anytime.</p>
           </div>
 
@@ -487,12 +397,12 @@ export default function App() {
                 <div className="text-sm font-bold tracking-widest flex items-center gap-2">
                   {tier.name} {tier.featured && <span className="rounded-full bg-[#0B9C74] px-2 py-0.5 text-[11px] text-white">POPULAR</span>}
                 </div>
-                <div className="mt-3 font-display text-[32px] font-black leading-none">{tier.price}</div>
+                <div className="mt-3 font-display text-[32px] font-bold leading-none">{tier.price}</div>
                 <div className={`text-xs ${tier.featured ? "text-white/60" : "text-[#6b6b6b]"}`}>{tier.sub}</div>
                 <ul className="mt-6 space-y-3 text-sm flex-1">
                   {tier.features.map((f) => (
                     <li key={f} className="flex gap-2">
-                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${tier.featured ? "text-[#0B9C74]" : "text-[#0B9C74]"}`} />
+                      <Check className="h-4 w-4 mt-0.5 shrink-0 text-[#0B9C74]" />
                       <span className={tier.featured ? "text-white/90" : "text-[#2b2b2b]"}>{f}</span>
                     </li>
                   ))}
@@ -511,7 +421,7 @@ export default function App() {
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
           <div className="rounded-[24px] bg-white p-6 sm:p-10 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div>
-              <h3 className="font-display text-[28px] lg:text-[36px] font-black leading-none tracking-tight">Open your WhatsApp store today.</h3>
+              <h3 className="font-display text-[28px] lg:text-[36px] font-bold leading-none tracking-tight">Open your WhatsApp store today.</h3>
               <p className="mt-3 max-w-[560px] text-sm leading-6 text-[#5a5a5a]">Import from Instagram or catalog in minutes. Your AI starts selling while you sleep — you keep the profit.</p>
               <div className="mt-2 flex items-center gap-4 text-xs font-bold text-[#6b6b6b]">
                 <span className="inline-flex items-center gap-1"><Check className="h-4 w-4 text-[#0B9C74]" /> No card required</span>
@@ -536,8 +446,8 @@ export default function App() {
           <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-8">
             <div>
               <div className="flex items-center gap-2.5">
-                <span className="h-8 w-8 rounded-lg bg-white text-[#1a1a1a] grid place-items-center font-black text-sm">W</span>
-                <span className="font-display font-black text-lg">wabac</span>
+                <span className="h-8 w-8 rounded-lg bg-white text-[#1a1a1a] grid place-items-center font-bold text-sm">C</span>
+                <span className="font-display font-bold text-lg">Cognicart</span>
               </div>
               <p className="mt-3 text-sm leading-6 text-white/60 max-w-[320px]">WhatsApp AI Commerce for African sellers. Sell where your customers chat.</p>
               <div className="mt-4 flex gap-2">
@@ -574,7 +484,7 @@ export default function App() {
             </div>
           </div>
           <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
-            <span>© 2026 wabac — Built in Port Harcourt for sellers everywhere.</span>
+            <span>© 2026 Cognicart — Built in Port Harcourt for sellers everywhere.</span>
             <span>Made with ♥ for WhatsApp</span>
           </div>
         </div>
