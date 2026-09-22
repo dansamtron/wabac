@@ -1,4 +1,4 @@
-export type AIToolName = "searchProducts" | "getProduct" | "checkStock" | "getBusinessInfo" | "createOrder" | "calculateOrderTotal"
+export type AIToolName = "searchProducts" | "getProduct" | "checkStock" | "getBusinessInfo" | "createOrder" | "calculateOrderTotal" | "createPayment"
 
 export type AIToolCall = {
   id: string
@@ -19,6 +19,8 @@ export type AIContext = {
   awaitingAddress?: boolean
   awaitingProductChoice?: boolean
   lastSearchResults?: Array<{ id: string; name: string; price: number; stock: number }>
+  lastOrderId?: string
+  lastOrderTotal?: number
 }
 
 export type AIResponse = {

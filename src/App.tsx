@@ -2,15 +2,18 @@ import { BrowserRouter } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
 import { BusinessProvider } from "./context/BusinessContext"
 import { AppRoutes } from "./routes/AppRoutes"
+import { ErrorBoundary } from "./components/ErrorBoundary"
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <BusinessProvider>
-          <AppRoutes />
-        </BusinessProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <BusinessProvider>
+            <AppRoutes />
+          </BusinessProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

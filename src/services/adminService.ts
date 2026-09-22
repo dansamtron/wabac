@@ -14,6 +14,7 @@ const MESSAGES_KEY = "cognicart_whatsapp_messages"
 const CONFIG_KEY = "cognicart_whatsapp_config"
 const BUSINESS_KEY = "cognicart_business"
 const FEE_KEY = "cognicart_platform_fee"
+const TRANSACTION_KEY = "cognicart_transactions"
 
 function isMockMode(error: unknown) {
   return !error || (error as { response?: unknown })?.response === undefined
@@ -85,6 +86,45 @@ function getConfigs(): WhatsAppConfig[] {
   }
 }
 
+function getTransactions(): Array<{ sellerId: string; orderId: string; amount: number; platformFee: number; paystackFee: number; sellerAmount: number; reference: string; status: string; createdAt: string; email?: string }> {
+  try {
+    return JSON.parse(localStorage.getItem(TRANSACTION_KEY) || "[]")
+  } catch {
+    return []
+  }
+}
+
+function ensureDemoTransactions() {
+  const txs = getTransactions()
+  if (txs.length > 0) return
+  const orders = getOrders().filter((o) => o.paymentStatus === "Paid")
+  if (orders.length === 0) return
+  const fee = getFeeConfig()
+  const seeded = orders.map((o) => {
+    const platformFee = Math.round(o.total * (fee.percentage / 100) + fee.fixed)
+    const paystackFee = Math.min(Math.round(o.total * 0.015), 2000)
+    return {
+      id: "txn_" + o.id,
+      sellerId: o.sellerId,
+      orderId: o.id,
+      amount: o.total,
+      subtotal: o.subtotal,
+      deliveryFee: o.deliveryFee,
+      platformFee,
+      sellerAmount: o.total - platformFee - paystackFee,
+      paystackFee,
+      currency: "NGN",
+      reference: o.paymentReference || "PSK_DEMO_" + o.id.slice(-6).toUpperCase(),
+      email: `${o.customerPhone.replace(/[^0-9]/g, "")}@cognicart.test`,
+      status: "success",
+      createdAt: o.createdAt,
+      verifiedAt: o.updatedAt,
+      channel: "paystack",
+    }
+  })
+  localStorage.setItem(TRANSACTION_KEY, JSON.stringify(seeded))
+}
+
 export const adminService = {
   getFeeConfig,
   setFeeConfig(cfg: PlatformFeeConfig) {
@@ -97,14 +137,20 @@ export const adminService = {
       return data
     } catch (error) {
       if (!isMockMode(error)) throw error
+      ensureDemoTransactions()
       const sellers = getSellers()
       const products = getProducts()
       const orders = getOrders()
       const customers = getCustomers()
       const messages = getMessages()
+      const transactions = getTransactions().filter((t) => t.status === "success")
       const fee = getFeeConfig()
       const totalSales = orders.filter((o) => o.paymentStatus === "Paid").reduce((sum, o) => sum + o.total, 0)
-      const platformRevenue = Math.round(totalSales * (fee.percentage / 100) + orders.filter((o) => o.paymentStatus === "Paid").length * fee.fixed)
+      const platformRevenueByTx = transactions.reduce((sum, t) => sum + t.platformFee, 0)
+      const paystackFees = transactions.reduce((sum, t) => sum + (t.paystackFee || 0), 0)
+      const platformRevenueComputed = Math.round(totalSales * (fee.percentage / 100) + orders.filter((o) => o.paymentStatus === "Paid").length * fee.fixed)
+      const platformRevenue = transactions.length > 0 ? platformRevenueByTx : platformRevenueComputed
+      const sellerEarnings = totalSales - platformRevenue - paystackFees
       return {
         totalSellers: sellers.length,
         activeSellers: sellers.filter((s) => s.isActive !== false).length,
@@ -121,12 +167,14 @@ export const adminService = {
         outboundMessages: messages.filter((m) => m.direction === "outbound").length,
         totalSales,
         platformRevenue,
-        sellerEarnings: totalSales - platformRevenue,
+        paystackFees,
+        sellerEarnings: Math.max(0, sellerEarnings),
         fee,
         orders,
         products,
         customers,
         messages,
+        transactions,
       }
     }
   },
@@ -199,15 +247,21 @@ export const adminService = {
   },
 
   async getRevenueBreakdown() {
+    ensureDemoTransactions()
     const orders = getOrders().filter((o) => o.paymentStatus === "Paid")
+    const transactions = getTransactions()
     const fee = getFeeConfig()
     const breakdown = orders.map((o) => {
-      const feeAmount = Math.round(o.total * (fee.percentage / 100) + fee.fixed)
-      return { orderId: o.id, sellerId: o.sellerId, customerName: o.customerName, total: o.total, fee: feeAmount, sellerEarning: o.total - feeAmount, createdAt: o.createdAt }
+      const tx = transactions.find((t) => t.orderId === o.id && t.status === "success")
+      const feeAmount = tx ? tx.platformFee : Math.round(o.total * (fee.percentage / 100) + fee.fixed)
+      const paystackFee = tx?.paystackFee ?? Math.min(Math.round(o.total * 0.015), 2000)
+      const sellerEarning = o.total - feeAmount - paystackFee
+      return { orderId: o.id, sellerId: o.sellerId, customerName: o.customerName, total: o.total, fee: feeAmount, paystackFee, sellerEarning, reference: tx?.reference || o.paymentReference || "—", createdAt: o.createdAt }
     })
     const totalSales = orders.reduce((sum, o) => sum + o.total, 0)
     const platformRevenue = breakdown.reduce((sum, b) => sum + b.fee, 0)
-    return { breakdown, totalSales, platformRevenue, sellerEarnings: totalSales - platformRevenue, fee }
+    const paystackFees = breakdown.reduce((sum, b) => sum + b.paystackFee, 0)
+    return { breakdown, totalSales, platformRevenue, paystackFees, sellerEarnings: Math.max(0, totalSales - platformRevenue - paystackFees), fee, transactions }
   },
 
   async getWhatsAppStats() {

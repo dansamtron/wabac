@@ -14,6 +14,8 @@ export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
 export type OrderItem = {
   productId: string
+  variantId?: string
+  variantLabel?: string
   name: string
   price: number
   quantity: number
@@ -34,6 +36,8 @@ export type Order = {
   deliveryFee: number
   total: number
   paymentStatus: PaymentStatus
+  paymentReference?: string
+  currency?: string
   orderStatus: OrderStatus
   createdAt: string
   updatedAt: string
@@ -46,7 +50,7 @@ export type CreateOrderPayload = {
     whatsappId?: string
     address?: string
   }
-  items: Array<{ productId: string; quantity: number }>
+  items: Array<{ productId: string; quantity: number; variantId?: string }>
   deliveryAddress?: string
   deliveryFee?: number
   paymentStatus?: PaymentStatus

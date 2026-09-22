@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useBusiness } from "../../context/BusinessContext"
-import { Upload, Store, Truck, CreditCard, MessageCircle } from "lucide-react"
+import { Upload, Store, Truck, CreditCard, MessageCircle, Info } from "lucide-react"
 import { Link } from "react-router-dom"
+import { paymentService } from "../../services/paymentService"
+import { adminService } from "../../services/adminService"
 
 export default function Settings() {
   const { user } = useAuth()
@@ -169,8 +171,15 @@ export default function Settings() {
         </div>
 
         <div className="rounded-2xl bg-white border border-[#F3E6D3] p-6">
-          <div className="flex items-center gap-2 text-sm font-bold"><CreditCard className="h-4 w-4 text-[#0B9C74]" /> Payment settings</div>
-          <p className="text-xs text-[#6b6b6b] mt-1">Payment settings for Paystack and transfers. Phase 7 will verify Paystack webhooks.</p>
+          <div className="flex items-center gap-2 text-sm font-bold"><CreditCard className="h-4 w-4 text-[#0B9C74]" /> Payment settings — Phase 7 Paystack</div>
+          <p className="text-xs text-[#6b6b6b] mt-1">Paystack is live. Mock success when VITE_PAYSTACK_PUBLIC_KEY is not set. Every Paid order splits platform fee {adminService.getFeeConfig().percentage}% + ₦{adminService.getFeeConfig().fixed} and Paystack 1.5% capped ₦2000. Verified in Revenue and Admin Payments.</p>
+          <div className="mt-3 rounded-xl bg-[#E6F7F1] border border-[#0B9C74]/20 p-3 text-xs leading-5 flex gap-2">
+            <Info className="h-4 w-4 text-[#0B9C74] mt-0.5 shrink-0" />
+            <div>
+              <div className="font-bold text-[#0B9C74]">Paystack status: {paymentService.getPublicKey() ? "Live key detected — real popup will open" : "Test/mock — payment auto-verifies in 1.2s"}</div>
+              <div className="text-[#6b6b6b]">Set VITE_PAYSTACK_PUBLIC_KEY in env to use real cards. Seller enable toggle below controls checkout display. Platform fee is configured in Admin → Settings.</div>
+            </div>
+          </div>
           <div className="mt-4 space-y-4">
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={form.paystackEnabled} onChange={(e) => setForm({ ...form, paystackEnabled: e.target.checked })} className="h-4 w-4 rounded border-[#F3E6D3] text-[#0B9C74]" />
