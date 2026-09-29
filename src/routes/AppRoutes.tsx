@@ -23,6 +23,7 @@ import { AdminLayout } from "../layouts/AdminLayout"
 import { PublicLayout } from "../layouts/PublicLayout"
 import { ProtectedRoute } from "./ProtectedRoute"
 import { AdminRoute } from "./AdminRoute"
+import { GuestRoute } from "./GuestRoute"
 import About from "../pages/public/About"
 import Contact from "../pages/public/Contact"
 import Careers from "../pages/public/Careers"
@@ -68,8 +69,8 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+      <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
       <Route element={<PublicLayout />}>
         <Route path="/store" element={<Storefront />} />
