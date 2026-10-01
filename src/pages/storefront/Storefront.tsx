@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
-import { Heart, ShoppingBag, Star, SlidersHorizontal } from "lucide-react"
+import { Heart, ShoppingBag, Star, SlidersHorizontal, Store } from "lucide-react"
 import { productService } from "../../services/productService"
 import { PRODUCT_CATEGORIES } from "../../types/product"
 import type { Product } from "../../types/product"
+import type { StorefrontProfile } from "../../types/business"
 import { getEffectivePrice, getDisplayPrice } from "../../types/product"
 import { useSEO } from "../../hooks/useSEO"
 
@@ -13,6 +14,7 @@ export default function Storefront() {
   const category = searchParams.get("category") || ""
   const q = searchParams.get("q") || ""
   const [products, setProducts] = useState<Product[]>([])
+  const [stores, setStores] = useState<Record<string, StorefrontProfile>>({})
   const [loading, setLoading] = useState(true)
 
   const title = q ? `Search "${q}" — Storefront | Cognicart` : category ? `${category} — Storefront | Cognicart` : "Storefront — Shop African Sellers Online | Cognicart"
@@ -41,6 +43,20 @@ export default function Storefront() {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, q])
+
+  // Resolve the public store profiles (name + logo) for the sellers whose
+  // products are on screen, so the marketplace can show store identity.
+  useEffect(() => {
+    const ids = [...new Set(products.map((p) => p.sellerId))].filter(Boolean).slice(0, 12)
+    if (!ids.length) { setStores({}); return }
+    let active = true
+    Promise.all(ids.map((id) => productService.getStorefront(id).then((profile) => [id, profile] as const).catch(() => null)))
+      .then((pairs) => {
+        if (!active) return
+        setStores(Object.fromEntries(pairs.filter((pair): pair is readonly [string, StorefrontProfile] => pair !== null)))
+      })
+    return () => { active = false }
+  }, [products])
 
   return (
     <div className="min-h-screen bg-[#FFFBF5]">
@@ -81,6 +97,18 @@ export default function Storefront() {
           </div>
         </div>
 
+        {!loading && Object.keys(stores).length > 0 && (
+          <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1">
+            <span className="shrink-0 text-xs font-bold tracking-widest text-[#9a9a9a]">STORES</span>
+            {Object.entries(stores).map(([id, s]) => (
+              <Link key={id} to={`/store/seller/${id}`} className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#F3E6D3] bg-white py-1.5 pl-1.5 pr-3.5 text-sm font-bold hover:bg-[#FFF1DA]">
+                <span className="grid h-6 w-6 place-items-center overflow-hidden rounded-full border border-[#F3E6D3] bg-[#FFF1DA]">{s.logo ? <img src={s.logo} alt="" className="h-full w-full object-cover" /> : <Store className="h-3 w-3 text-[#E85D26]" />}</span>
+                {s.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
         {loading ? (
           <div className="grid place-items-center py-16"><div className="h-8 w-8 rounded-full border-2 border-[#0B9C74] border-t-transparent animate-spin" /></div>
         ) : products.length === 0 ? (
@@ -106,7 +134,7 @@ export default function Storefront() {
                     {(() => { const d = getDisplayPrice(p); const ep = getEffectivePrice(p); return d.hasDiscount ? <span className="flex items-center gap-1"><span className="text-sm font-bold text-[#E85D26]">₦{ep.toLocaleString()}</span><span className="text-xs line-through text-[#9a9a9a]">₦{d.original.toLocaleString()}</span></span> : <span className="text-sm font-bold">₦{ep.toLocaleString()}</span> })()}
                     <span className="h-8 w-8 rounded-full bg-[#1a1a1a] text-white grid place-items-center"><ShoppingBag className="h-4 w-4" /></span>
                   </div>
-                  <div className="mt-2 text-xs text-[#0B9C74] font-bold">View • SEO product page →</div>
+                  {stores[p.sellerId] ? <div className="mt-2 flex min-w-0 items-center gap-1.5 text-xs font-bold text-[#6b6b6b]"><span className="grid h-4 w-4 shrink-0 place-items-center overflow-hidden rounded-full border border-[#F3E6D3] bg-[#FFF1DA]">{stores[p.sellerId].logo ? <img src={stores[p.sellerId].logo} alt="" className="h-full w-full object-cover" /> : <Store className="h-2.5 w-2.5 text-[#E85D26]" />}</span><span className="truncate">{stores[p.sellerId].name}</span></div> : <div className="mt-2 text-xs text-[#0B9C74] font-bold">View product →</div>}
                 </div>
               </Link>
             ))}
