@@ -45,6 +45,7 @@ export function Footer() {
               <li><Link to="/privacy" className="hover:text-white transition">Privacy</Link></li>
               <li><Link to="/terms" className="hover:text-white transition">Terms</Link></li>
               <li><Link to="/cart" className="hover:text-white transition">Cart</Link></li>
+              <li><Link to="/track" className="hover:text-white transition">Track your order</Link></li>
             </ul>
           </div>
 

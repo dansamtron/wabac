@@ -41,6 +41,7 @@ export function Header() {
               </Link>
               <button onClick={() => scrollTo("sellers")} className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Sellers</button>
               <button onClick={() => scrollTo("pricing")} className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Pricing</button>
+              <Link to="/track" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Track order</Link>
               <Link to="/contact" className="px-3 py-2 rounded-full hover:bg-[#FFF1DA] transition">Contact</Link>
             </nav>
           </div>
@@ -79,6 +80,7 @@ export function Header() {
               <Link to="/store" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Marketplace</Link>
               <button onClick={() => scrollTo("sellers")} className="text-left px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Sellers</button>
               <button onClick={() => scrollTo("pricing")} className="text-left px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Pricing</button>
+              <Link to="/track" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Track order</Link>
               <Link to="/contact" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl bg-white border border-[#F3E6D3]">Contact</Link>
               <div className="mt-2 grid gap-2">
                 <Link to="/search" onClick={() => setMobileOpen(false)} className="inline-flex justify-center items-center gap-2 rounded-full bg-white border border-[#F3E6D3] px-6 py-3 font-bold">Search</Link>
