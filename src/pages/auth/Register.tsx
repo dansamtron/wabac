@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext"
 import { PasswordInput } from "../../components/forms/PasswordInput"
 import { AuthLayout } from "../../layouts/AuthLayout"
+import { getApiErrorMessage } from "../../services/apiError"
 
 export default function Register() {
   const { register } = useAuth()
@@ -31,7 +32,7 @@ export default function Register() {
       await register({ businessName: form.businessName, email: form.email, password: form.password, phone: form.phone })
       navigate("/dashboard")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Registration failed"
+      const msg = getApiErrorMessage(err, "Registration failed")
       setError(msg)
     } finally {
       setLoading(false)

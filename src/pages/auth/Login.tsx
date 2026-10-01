@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext"
 import { PasswordInput } from "../../components/forms/PasswordInput"
 import { AuthLayout } from "../../layouts/AuthLayout"
 import { authService } from "../../services/authService"
+import { getApiErrorMessage } from "../../services/apiError"
 
 export default function Login() {
   const { login } = useAuth()
@@ -29,7 +30,7 @@ export default function Login() {
         navigate("/dashboard")
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Login failed"
+      const msg = getApiErrorMessage(err, "Login failed")
       setError(msg)
     } finally {
       setLoading(false)

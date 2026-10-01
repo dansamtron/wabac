@@ -9,6 +9,7 @@ import { productService } from "../services/productService"
 import { buildCheckoutPayload, validateCheckoutCustomer } from "../utils/checkout"
 import { getEffectivePrice, getTotalStock } from "../types/product"
 import type { Product, ProductVariant } from "../types/product"
+import { getApiErrorMessage } from "../services/apiError"
 
 type CartItem = { product: Product; variant: ProductVariant | null; effectivePrice: number; quantity: number; maxStock: number }
 
@@ -103,7 +104,7 @@ export default function Cart() {
       })
       clear()
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Unable to start checkout.")
+      setError(getApiErrorMessage(reason, "Unable to start checkout."))
     } finally {
       setSubmitting(false)
     }
