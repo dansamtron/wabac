@@ -1,7 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
 import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Menu, X, Store, Wallet, Send, Megaphone, Shield } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
-import { useBusiness } from "../context/BusinessContext"
 import { useState } from "react"
 
 const nav = [
@@ -18,7 +17,6 @@ const nav = [
 
 export function DashboardLayout() {
   const { user, logout } = useAuth()
-  const { business } = useBusiness()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
@@ -49,7 +47,7 @@ export function DashboardLayout() {
               <div className="text-sm font-bold leading-none">{user?.businessName || "Seller"}</div>
               <div className="text-xs text-[#6b6b6b]">{user?.email}</div>
             </div>
-            <div className="h-9 w-9 overflow-hidden rounded-full bg-[#1a1a1a] text-white grid place-items-center text-sm font-bold">{business?.logo ? <img src={business.logo} alt="Business logo" className="h-full w-full object-cover" /> : user?.businessName?.charAt(0)?.toUpperCase() || "S"}</div>
+            <div className="h-9 w-9 rounded-full bg-[#1a1a1a] text-white grid place-items-center text-sm font-bold">{user?.businessName?.charAt(0)?.toUpperCase() || "S"}</div>
             <button onClick={handleLogout} className="hidden sm:inline-flex items-center gap-2 rounded-full border border-[#F3E6D3] bg-white px-3 py-1.5 text-sm font-medium hover:bg-[#FFF1DA]">
               <LogOut className="h-4 w-4" /> Logout
             </button>
