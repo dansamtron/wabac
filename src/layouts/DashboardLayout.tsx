@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom"
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom"
 import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Menu, X, Store, Wallet, Send, Megaphone, Shield } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import { useBusiness } from "../context/BusinessContext"
@@ -35,13 +35,13 @@ export function DashboardLayout() {
             <button onClick={() => setOpen(!open)} className="lg:hidden h-9 w-9 grid place-items-center rounded-xl border border-[#F3E6D3] bg-white">
               {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
-            <div className="flex items-center gap-2.5">
+            <Link to="/" className="flex items-center gap-2.5" title="Go to homepage">
               <span className="h-8 w-8 rounded-lg bg-[#0B9C74] grid place-items-center text-white">
                 <Store className="h-4 w-4" />
               </span>
-              <span className="font-display font-bold">Cognicart</span>
+              <span className="font-display font-bold hover:text-[#0B9C74] transition">Cognicart</span>
               <span className="hidden sm:inline-flex text-[11px] font-bold tracking-widest text-[#0B9C74] bg-[#E6F7F1] px-2 py-0.5 rounded">SELLER</span>
-            </div>
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
